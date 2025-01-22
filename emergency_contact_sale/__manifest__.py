@@ -1,8 +1,8 @@
 {
-    'name': 'nko Test Module - Emergency Contact on Sale Order',
+    'name': 'Emergency Contact on Sale Order',
     'version': '1.0',
     'category': 'Sales',
-    'summary': 'Testing the addition of emergency contact fields to sales orders',
+    'summary': 'Adding Emergency Contact to Sale Order',
     'description': '''
         This module adds emergency contact information to sales orders:
         - Emergency Contact
