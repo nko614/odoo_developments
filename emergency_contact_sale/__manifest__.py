@@ -4,7 +4,7 @@
     'category': 'Sales',
     'summary': 'Testing the addition of emergency contact fields to sales orders',
     'description': '''
-        This test module adds emergency contact information to sales orders:
+        This module adds emergency contact information to sales orders:
         - Emergency Contact
         - Emergency Phone Number
     ''',
