@@ -14,7 +14,6 @@
     'depends': ['sale', 'base'],
     'data': [
         'views/sale_order_views.xml',
-        'views/product_view.xml',
     ],
     'images': [
         'static/description/icon.png',
