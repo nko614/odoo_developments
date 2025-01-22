@@ -1,15 +1,22 @@
 {
     'name': 'Prevent Duplicate SKUs',
     'version': '1.0',
-    'category': 'Inventory',
-    'summary': 'Prevent duplicate product reference numbers',
-    'description': '''
-        Prevents products from having duplicate reference numbers (SKUs):
-        - Checks both product.template and product.product
-        - Raises warning if duplicate default_code is found
-    ''',
-    'depends': ['product'],
+    'category': 'Tools',
+    'summary': 'Ensure unique SKUs in your product catalog',
+    'description': """
+        Prevent duplicate SKUs (default_code) in Odoo by validating that each product has a unique Reference Number.
+        This ensures data integrity and avoids conflicts during product creation or updates.
+    """,
+    'description_html': 'static/description/description.html',
+    'author': 'Nicholas Kosinski (nko)',
+    'website': 'https://odoo.com',
+    'depends': ['base'],
+    'data': ['views/product_view.xml'],
+    'images': [
+        'static/description/icon.png',
+        'static/description/cover.png',
+    ],
     'installable': True,
-    'application': False,
+    'application': True,
     'license': 'LGPL-3',
-} 
+}
