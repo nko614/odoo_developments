@@ -11,7 +11,7 @@
     'author': 'Nicholas Kosinski (nko)',
     'website': 'https://odoo.com',
     'depends': ['base'],
-    'data': ['views/product_view.xml'],
+    'data': [],
     'images': [
         'static/description/icon.png',
         'static/description/cover.png',
