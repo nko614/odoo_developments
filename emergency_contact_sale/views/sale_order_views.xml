@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_emergency" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.emergency</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='order_details']" position="inside">
+                <field name="emergency_contact_id"/>
+                <field name="emergency_phone" widget="phone"/>
+            </xpath>
+        </field>
+    </record>
+</odoo> 
