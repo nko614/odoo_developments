@@ -1,18 +1,26 @@
 {
-    'name': 'NKO Test',
+    'name': 'nko Test Module - Emergency Contact on Sale Order',
     'version': '1.0',
     'category': 'Sales',
-    'summary': 'Add emergency contact fields to sales orders',
+    'summary': 'Testing the addition of emergency contact fields to sales orders',
     'description': '''
-        Adds emergency contact information to sales orders:
+        This test module adds emergency contact information to sales orders:
         - Emergency Contact
         - Emergency Phone Number
     ''',
-    'depends': ['sale'],
+    'description_html': 'static/description/description.html',
+    'author': 'Nicholas Kosinski (nko)',
+    'website': 'https://odoo.com',
+    'depends': ['sale', 'base'],
     'data': [
         'views/sale_order_views.xml',
+        'views/product_view.xml',
+    ],
+    'images': [
+        'static/description/icon.png',
+        'static/description/cover.png',
     ],
     'installable': True,
     'application': False,
     'license': 'LGPL-3',
-} 
+}
