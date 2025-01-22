@@ -15,6 +15,7 @@
     'images': [
         'static/description/icon.png',
         'static/description/cover.png',
+        'static/description/duplicate.png',
     ],
     'installable': True,
     'application': True,
