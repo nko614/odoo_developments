@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.nko.google</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@name='shipping_setting_container']" position="inside">
+                    <setting id="delivery_route_optimization" help="Configure automatic route optimization settings">
+                        <field name="auto_optimize_routes"/>
+                        <div class="mt16" invisible="not auto_optimize_routes">
+                            <field name="optimize_route_interval"/>
+                        </div>
+                    </setting>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo> 
