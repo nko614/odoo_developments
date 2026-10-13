@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="strava_athlete_stat_view_list" model="ir.ui.view">
+        <field name="name">strava.athlete.stat.list</field>
+        <field name="model">strava.athlete.stat</field>
+        <field name="arch" type="xml">
+            <list string="Strava Totals" create="0" edit="0" delete="0" decoration-muted="is_sample">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync Now" class="btn-primary" display="always" icon="refresh"/>
+                </header>
+                <field name="is_sample" column_invisible="1"/>
+                <field name="period"/>
+                <field name="sport"/>
+                <field name="count"/>
+                <field name="distance_mi"/>
+                <field name="moving_time_display"/>
+                <field name="elevation_ft"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="strava_athlete_stat_view_search" model="ir.ui.view">
+        <field name="name">strava.athlete.stat.search</field>
+        <field name="model">strava.athlete.stat</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="run" string="Run" domain="[('sport', '=', 'run')]"/>
+                <filter name="ride" string="Ride" domain="[('sport', '=', 'ride')]"/>
+                <filter name="swim" string="Swim" domain="[('sport', '=', 'swim')]"/>
+                <group>
+                    <filter name="group_period" string="Period" context="{'group_by': 'period'}"/>
+                    <filter name="group_sport" string="Sport" context="{'group_by': 'sport'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="strava_athlete_stat_action" model="ir.actions.act_window">
+        <field name="name">Strava Totals</field>
+        <field name="res_model">strava.athlete.stat</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_group_period': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No totals yet</p>
+            <p>Totals (last 4 weeks, year to date, all time) come from Strava's athlete stats on every sync.</p>
+        </field>
+    </record>
+</odoo>

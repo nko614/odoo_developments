@@ -1,0 +1,8 @@
+id,name,model_id,group_id/id,operation,domain
+access_fitness_connection_system,fitness.connection system,fitness.connection,base.group_system,crud,
+access_strava_activity_user,strava.activity user,strava.activity,base.group_user,crud,
+access_strava_athlete_stat_user,strava.athlete.stat user,strava.athlete.stat,base.group_user,crud,
+access_whoop_recovery_user,whoop.recovery user,whoop.recovery,base.group_user,crud,
+access_whoop_sleep_user,whoop.sleep user,whoop.sleep,base.group_user,crud,
+access_whoop_cycle_user,whoop.cycle user,whoop.cycle,base.group_user,crud,
+access_whoop_workout_user,whoop.workout user,whoop.workout,base.group_user,crud,

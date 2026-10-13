@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nko_strava.ActivityMap">
+        <div class="o_action o_nko_strava_map_action">
+            <div class="o_nko_strava_map_toolbar d-flex flex-wrap align-items-center gap-3 px-3 py-2 border-bottom bg-view">
+                <span class="fs-4 fw-bold me-2">Activity Map</span>
+                <select class="form-select w-auto" t-on-change="(ev) => this.onSportChange(ev)">
+                    <option value="">All sports</option>
+                    <t t-foreach="this.state.sports" t-as="sport" t-key="sport[0]">
+                        <option t-att-value="sport[0]" t-att-selected="this.state.sport === sport[0]" t-out="sport[1]"/>
+                    </t>
+                </select>
+                <select class="form-select w-auto" t-on-change="(ev) => this.onYearChange(ev)">
+                    <option value="">All years</option>
+                    <t t-foreach="this.state.years" t-as="year" t-key="year">
+                        <option t-att-value="year" t-att-selected="this.state.year == year" t-out="year"/>
+                    </t>
+                </select>
+                <span class="text-muted o_nko_strava_map_count" t-att-data-count="this.state.loading ? '' : this.state.count">
+                    <t t-if="this.state.loading">Loading routes...</t>
+                    <t t-else=""><t t-out="this.state.count"/> routes · <t t-out="this.state.totalMiles"/> mi</t>
+                </span>
+                <span class="ms-auto small text-muted d-none d-md-inline">
+                    <t t-foreach="this.legend" t-as="entry" t-key="entry[0]">
+                        <span class="me-2 text-nowrap"><span class="o_nko_strava_legend_swatch" t-att-style="'background-color: ' + entry[1]"/><t t-out="entry[0]"/></span>
+                    </t>
+                </span>
+            </div>
+            <div class="o_nko_strava_all_map" t-ref="this.mapRef"/>
+        </div>
+    </t>
+</templates>
