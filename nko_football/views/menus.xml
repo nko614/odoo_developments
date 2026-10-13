@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nfl_root" name="Football" sequence="90" web_icon="nko_football,static/description/icon.png"/>
+    <menuitem id="menu_nfl_teams" name="Teams" parent="menu_nfl_root" action="nfl_team_action" sequence="10"/>
+    <menuitem id="menu_nfl_schedule" name="Schedule" parent="menu_nfl_root" action="nfl_game_action" sequence="20"/>
+</odoo>

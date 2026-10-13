@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nfl_team_view_list" model="ir.ui.view">
+        <field name="name">nfl.team.list</field>
+        <field name="model">nfl.team</field>
+        <field name="arch" type="xml">
+            <list string="Teams" create="0">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync from ESPN" class="btn-primary" display="always"/>
+                </header>
+                <field name="logo_url" widget="image_url" options="{'size': [28, 28]}" string=" "/>
+                <field name="name"/>
+                <field name="conference"/>
+                <field name="division"/>
+                <field name="record"/>
+                <field name="win_pct"/>
+                <field name="points_for" optional="show"/>
+                <field name="points_against" optional="show"/>
+                <field name="point_diff" optional="show"/>
+                <field name="streak"/>
+                <field name="playoff_seed" optional="hide"/>
+                <field name="next_game_id"/>
+                <field name="next_kickoff" string="Next Kickoff"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nfl_team_view_form" model="ir.ui.view">
+        <field name="name">nfl.team.form</field>
+        <field name="model">nfl.team</field>
+        <field name="arch" type="xml">
+            <form string="Team" create="0">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_games" type="object" class="oe_stat_button" icon="fa-calendar" string="Schedule"/>
+                    </div>
+                    <field name="logo_url" widget="image_url" class="oe_avatar" options="{'size': [90, 90]}" nolabel="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="record" readonly="1"/> · <field name="division" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Record">
+                            <field name="wins"/>
+                            <field name="losses"/>
+                            <field name="ties"/>
+                            <field name="win_pct"/>
+                            <field name="streak"/>
+                            <field name="playoff_seed"/>
+                        </group>
+                        <group string="Points">
+                            <field name="points_for"/>
+                            <field name="points_against"/>
+                            <field name="point_diff"/>
+                            <field name="next_game_id"/>
+                            <field name="next_kickoff"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Schedule" name="schedule">
+                            <field name="game_ids" readonly="1">
+                                <list decoration-muted="status == 'final'">
+                                    <field name="week"/>
+                                    <field name="kickoff" string="Date / Time"/>
+                                    <field name="away_team_id"/>
+                                    <field name="home_team_id"/>
+                                    <field name="score"/>
+                                    <field name="venue"/>
+                                    <field name="location"/>
+                                    <field name="broadcast"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Details" name="details">
+                            <group>
+                                <field name="abbreviation"/>
+                                <field name="location"/>
+                                <field name="conference"/>
+                                <field name="espn_id"/>
+                                <field name="color"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="nfl_team_view_search" model="ir.ui.view">
+        <field name="name">nfl.team.search</field>
+        <field name="model">nfl.team</field>
+        <field name="arch" type="xml">
+            <search string="Teams">
+                <field name="name"/>
+                <field name="division"/>
+                <filter name="afc" string="AFC" domain="[('conference', '=', 'AFC')]"/>
+                <filter name="nfc" string="NFC" domain="[('conference', '=', 'NFC')]"/>
+                <group>
+                    <filter name="group_conference" string="Conference" context="{'group_by': 'conference'}"/>
+                    <filter name="group_division" string="Division" context="{'group_by': 'division'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="nfl_team_action" model="ir.actions.act_window">
+        <field name="name">Teams</field>
+        <field name="res_model">nfl.team</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_division': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No teams yet</p>
+            <p>Click <b>Sync from ESPN</b> to pull all 32 NFL teams.</p>
+        </field>
+    </record>
+</odoo>

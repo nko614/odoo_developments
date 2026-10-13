@@ -1,0 +1,35 @@
+<section class="container">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>Pro Football Tracker: Standings &amp; Schedule</h2>
+      <p class="lead">Every pro football team, the current standings and the full season schedule, kept up to date inside Odoo.</p>
+      <img src="banner.png" alt="Pro Football Tracker" class="img-fluid" style="max-width:720px"/>
+    </div>
+  </div>
+</section>
+
+<section class="container mt-5">
+  <h3>What you get</h3>
+  <ul>
+    <li><b>Teams</b>: all 32 teams with logo, conference and division, grouped by division out of the box.</li>
+    <li><b>Standings</b>: wins, losses, ties, win percentage, points for and against, point differential, streak and playoff seed.</li>
+    <li><b>Schedule</b>: every regular-season and postseason game with kickoff time (in your timezone), stadium, city, TV network, score and status (scheduled, in progress, final, postponed).</li>
+    <li><b>Calendar view</b> of the season, color-coded by home team, plus filters for upcoming games, finals, postseason and international / neutral-site games.</li>
+    <li>Each team page shows its next game and its full schedule.</li>
+  </ul>
+
+  <h3>Setup</h3>
+  <ol>
+    <li>Install the app. No account or API key is needed.</li>
+    <li>Open <b>Football &rarr; Teams</b> and click <b>Sync from ESPN</b>. The first sync takes about a minute.</li>
+    <li>After that, a scheduled action refreshes teams, standings and scores every 6 hours. You can change the interval under <b>Settings &rarr; Technical &rarr; Scheduled Actions</b>.</li>
+  </ol>
+
+  <h3>Notes</h3>
+  <ul>
+    <li>Data comes from ESPN's public site API, which is undocumented and could change without notice.</li>
+    <li>Team logos are loaded from ESPN's servers when displayed; none are bundled with the module.</li>
+    <li>Requires the Python <code>requests</code> library (included with Odoo).</li>
+    <li>Not affiliated with, endorsed by, or sponsored by the National Football League or ESPN. NFL, team names and logos are trademarks of their respective owners.</li>
+  </ul>
+</section>
