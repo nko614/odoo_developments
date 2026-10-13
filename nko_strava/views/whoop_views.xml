@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================ Recovery ============================ -->
+    <record id="whoop_recovery_view_list" model="ir.ui.view">
+        <field name="name">whoop.recovery.list</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <list string="Recovery" create="0"
+                  decoration-success="recovery_zone == 'green'"
+                  decoration-warning="recovery_zone == 'yellow'"
+                  decoration-danger="recovery_zone == 'red'">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync Now" class="btn-primary" display="always" icon="refresh"/>
+                </header>
+                <field name="date"/>
+                <field name="recovery_score"/>
+                <field name="recovery_zone" widget="badge"
+                       decoration-success="recovery_zone == 'green'"
+                       decoration-warning="recovery_zone == 'yellow'"
+                       decoration-danger="recovery_zone == 'red'"/>
+                <field name="hrv_rmssd"/>
+                <field name="resting_heart_rate"/>
+                <field name="spo2" optional="show"/>
+                <field name="skin_temp_f" optional="show"/>
+                <field name="skin_temp_c" optional="hide"/>
+                <field name="user_calibrating" optional="hide"/>
+                <field name="score_state" optional="hide"/>
+                <field name="is_sample" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_view_form" model="ir.ui.view">
+        <field name="name">whoop.recovery.form</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <form string="Recovery" create="0">
+                <sheet>
+                    <div class="oe_title">
+                        <span class="badge text-bg-warning" invisible="not is_sample">Sample data</span>
+                        <h1>Recovery <field name="date" readonly="1" class="oe_inline"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="recovery_score"/>
+                            <field name="recovery_zone" widget="badge"
+                                   decoration-success="recovery_zone == 'green'"
+                                   decoration-warning="recovery_zone == 'yellow'"
+                                   decoration-danger="recovery_zone == 'red'"/>
+                            <field name="hrv_rmssd"/>
+                            <field name="resting_heart_rate"/>
+                        </group>
+                        <group>
+                            <field name="spo2"/>
+                            <field name="skin_temp_f"/>
+                            <field name="skin_temp_c"/>
+                            <field name="user_calibrating"/>
+                            <field name="score_state"/>
+                            <field name="created_at"/>
+                            <field name="whoop_id"/>
+                            <field name="is_sample"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_view_graph" model="ir.ui.view">
+        <field name="name">whoop.recovery.graph</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <graph string="Recovery over time" type="line">
+                <field name="date" interval="day"/>
+                <field name="recovery_score" type="measure"/>
+                <field name="hrv_rmssd" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_view_pivot" model="ir.ui.view">
+        <field name="name">whoop.recovery.pivot</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <pivot string="Recovery">
+                <field name="date" interval="month" type="row"/>
+                <field name="recovery_score" type="measure"/>
+                <field name="hrv_rmssd" type="measure"/>
+                <field name="resting_heart_rate" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_view_calendar" model="ir.ui.view">
+        <field name="name">whoop.recovery.calendar</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <calendar string="Recovery" date_start="date" mode="month" color="recovery_zone" create="0" quick_create="0">
+                <field name="recovery_score"/>
+                <field name="hrv_rmssd"/>
+                <field name="resting_heart_rate"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_view_search" model="ir.ui.view">
+        <field name="name">whoop.recovery.search</field>
+        <field name="model">whoop.recovery</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="green" string="Green (67+)" domain="[('recovery_zone', '=', 'green')]"/>
+                <filter name="yellow" string="Yellow (34-66)" domain="[('recovery_zone', '=', 'yellow')]"/>
+                <filter name="red" string="Red (0-33)" domain="[('recovery_zone', '=', 'red')]"/>
+                <separator/>
+                <filter name="last_30" string="Last 30 Days" domain="[('date', '&gt;=', 'today -30d')]"/>
+                <filter name="this_year" string="This Year" domain="[('date', '&gt;=', 'today =1m =1d')]"/>
+                <filter name="filter_date" string="Date" date="date"/>
+                <separator/>
+                <filter name="sample" string="Sample Data" domain="[('is_sample', '=', True)]"/>
+                <group>
+                    <filter name="group_zone" string="Zone" context="{'group_by': 'recovery_zone'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="whoop_recovery_action" model="ir.actions.act_window">
+        <field name="name">Recovery</field>
+        <field name="res_model">whoop.recovery</field>
+        <field name="view_mode">list,graph,calendar,pivot,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No recovery data yet</p>
+            <p>Connect WHOOP in <b>Configuration &gt; Settings</b>, then click <b>Sync Now</b>.</p>
+        </field>
+    </record>
+
+    <!-- ============================ Sleep ============================ -->
+    <record id="whoop_sleep_view_list" model="ir.ui.view">
+        <field name="name">whoop.sleep.list</field>
+        <field name="model">whoop.sleep</field>
+        <field name="arch" type="xml">
+            <list string="Sleep" create="0"
+                  decoration-success="performance &gt;= 85"
+                  decoration-warning="performance &gt;= 70 and performance &lt; 85"
+                  decoration-danger="performance &lt; 70 and score_state == 'SCORED'"
+                  decoration-muted="nap">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync Now" class="btn-primary" display="always" icon="refresh"/>
+                </header>
+                <field name="score_state" column_invisible="1"/>
+                <field name="date"/>
+                <field name="start" optional="show"/>
+                <field name="end" optional="hide"/>
+                <field name="nap" optional="show"/>
+                <field name="performance"/>
+                <field name="asleep_hours" widget="float_time"/>
+                <field name="in_bed_hours" widget="float_time" optional="show"/>
+                <field name="light_hours" widget="float_time" optional="show"/>
+                <field name="deep_hours" widget="float_time" optional="show"/>
+                <field name="rem_hours" widget="float_time" optional="show"/>
+                <field name="awake_hours" widget="float_time" optional="show"/>
+                <field name="sleep_need_hours" widget="float_time" optional="hide"/>
+                <field name="efficiency" optional="show"/>
+                <field name="consistency" optional="show"/>
+                <field name="respiratory_rate" optional="hide"/>
+                <field name="disturbances" optional="hide"/>
+                <field name="is_sample" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="whoop_sleep_view_form" model="ir.ui.view">
+        <field name="name">whoop.sleep.form</field>
+        <field name="model">whoop.sleep</field>
+        <field name="arch" type="xml">
+            <form string="Sleep" create="0">
+                <sheet>
+                    <div class="oe_title">
+                        <span class="badge text-bg-warning" invisible="not is_sample">Sample data</span>
+                        <h1>Sleep <field name="date" readonly="1" class="oe_inline"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scores">
+                            <field name="performance"/>
+                            <field name="efficiency"/>
+                            <field name="consistency"/>
+                            <field name="respiratory_rate"/>
+                            <field name="disturbances"/>
+                            <field name="sleep_cycles"/>
+                            <field name="nap"/>
+                            <field name="score_state"/>
+                        </group>
+                        <group string="Stages (h:mm)">
+                            <field name="start"/>
+                            <field name="end"/>
+                            <field name="in_bed_hours" widget="float_time"/>
+                            <field name="asleep_hours" widget="float_time"/>
+                            <field name="light_hours" widget="float_time"/>
+                            <field name="deep_hours" widget="float_time"/>
+                            <field name="rem_hours" widget="float_time"/>
+                            <field name="awake_hours" widget="float_time"/>
+                            <field name="sleep_need_hours" widget="float_time"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="whoop_sleep_view_graph" model="ir.ui.view">
+        <field name="name">whoop.sleep.graph</field>
+        <field name="model">whoop.sleep</field>
+        <field name="arch" type="xml">
+            <graph string="Sleep over time" type="line">
+                <field name="date" interval="day"/>
+                <field name="asleep_hours" type="measure"/>
+                <field name="performance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="whoop_sleep_view_calendar" model="ir.ui.view">
+        <field name="name">whoop.sleep.calendar</field>
+        <field name="model">whoop.sleep</field>
+        <field name="arch" type="xml">
+            <calendar string="Sleep" date_start="start" date_stop="end" mode="week" color="nap" create="0" quick_create="0">
+                <field name="performance"/>
+                <field name="asleep_hours" widget="float_time"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="whoop_sleep_view_search" model="ir.ui.view">
+        <field name="name">whoop.sleep.search</field>
+        <field name="model">whoop.sleep</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="no_naps" string="Night Sleep" domain="[('nap', '=', False)]"/>
+                <filter name="naps" string="Naps" domain="[('nap', '=', True)]"/>
+                <separator/>
+                <filter name="last_30" string="Last 30 Days" domain="[('date', '&gt;=', 'today -30d')]"/>
+                <filter name="filter_date" string="Date" date="date"/>
+                <separator/>
+                <filter name="sample" string="Sample Data" domain="[('is_sample', '=', True)]"/>
+                <group>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="whoop_sleep_action" model="ir.actions.act_window">
+        <field name="name">Sleep</field>
+        <field name="res_model">whoop.sleep</field>
+        <field name="view_mode">list,graph,calendar,form</field>
+        <field name="context">{'search_default_no_naps': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No sleep data yet</p>
+        </field>
+    </record>
+
+    <!-- ============================ Cycles (strain) ============================ -->
+    <record id="whoop_cycle_view_list" model="ir.ui.view">
+        <field name="name">whoop.cycle.list</field>
+        <field name="model">whoop.cycle</field>
+        <field name="arch" type="xml">
+            <list string="Strain" create="0"
+                  decoration-danger="strain &gt;= 18"
+                  decoration-warning="strain &gt;= 14 and strain &lt; 18"
+                  decoration-info="strain &lt; 10">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync Now" class="btn-primary" display="always" icon="refresh"/>
+                </header>
+                <field name="date"/>
+                <field name="start" optional="hide"/>
+                <field name="end" optional="hide"/>
+                <field name="strain"/>
+                <field name="calories"/>
+                <field name="average_heart_rate"/>
+                <field name="max_heart_rate"/>
+                <field name="kilojoule" optional="hide"/>
+                <field name="score_state" optional="hide"/>
+                <field name="is_sample" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="whoop_cycle_view_form" model="ir.ui.view">
+        <field name="name">whoop.cycle.form</field>
+        <field name="model">whoop.cycle</field>
+        <field name="arch" type="xml">
+            <form string="Cycle" create="0">
+                <sheet>
+                    <div class="oe_title">
+                        <span class="badge text-bg-warning" invisible="not is_sample">Sample data</span>
+                        <h1>Strain <field name="date" readonly="1" class="oe_inline"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="strain"/>
+                            <field name="calories"/>
+                            <field name="kilojoule"/>
+                            <field name="average_heart_rate"/>
+                            <field name="max_heart_rate"/>
+                        </group>
+                        <group>
+                            <field name="start"/>
+                            <field name="end"/>
+                            <field name="timezone_offset"/>
+                            <field name="score_state"/>
+                            <field name="whoop_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="whoop_cycle_view_graph" model="ir.ui.view">
+        <field name="name">whoop.cycle.graph</field>
+        <field name="model">whoop.cycle</field>
+        <field name="arch" type="xml">
+            <graph string="Strain over time" type="line">
+                <field name="date" interval="day"/>
+                <field name="strain" type="measure"/>
+                <field name="calories" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="whoop_cycle_view_calendar" model="ir.ui.view">
+        <field name="name">whoop.cycle.calendar</field>
+        <field name="model">whoop.cycle</field>
+        <field name="arch" type="xml">
+            <calendar string="Strain" date_start="date" mode="month" create="0" quick_create="0">
+                <field name="strain"/>
+                <field name="calories"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="whoop_cycle_view_search" model="ir.ui.view">
+        <field name="name">whoop.cycle.search</field>
+        <field name="model">whoop.cycle</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="last_30" string="Last 30 Days" domain="[('date', '&gt;=', 'today -30d')]"/>
+                <filter name="filter_date" string="Date" date="date"/>
+                <separator/>
+                <filter name="sample" string="Sample Data" domain="[('is_sample', '=', True)]"/>
+                <group>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="whoop_cycle_action" model="ir.actions.act_window">
+        <field name="name">Strain</field>
+        <field name="res_model">whoop.cycle</field>
+        <field name="view_mode">list,graph,calendar,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No strain data yet</p>
+        </field>
+    </record>
+
+    <!-- ============================ Workouts ============================ -->
+    <record id="whoop_workout_view_list" model="ir.ui.view">
+        <field name="name">whoop.workout.list</field>
+        <field name="model">whoop.workout</field>
+        <field name="arch" type="xml">
+            <list string="Workouts" create="0">
+                <header>
+                    <button name="action_sync_all" type="object" string="Sync Now" class="btn-primary" display="always" icon="refresh"/>
+                </header>
+                <field name="start"/>
+                <field name="sport_name"/>
+                <field name="duration_display"/>
+                <field name="strain"/>
+                <field name="average_heart_rate"/>
+                <field name="max_heart_rate"/>
+                <field name="calories" sum="Total kcal"/>
+                <field name="distance_mi" optional="show"/>
+                <field name="altitude_gain_ft" optional="hide"/>
+                <field name="zone2_min" optional="hide"/>
+                <field name="zone3_min" optional="hide"/>
+                <field name="zone4_min" optional="hide"/>
+                <field name="zone5_min" optional="hide"/>
+                <field name="is_sample" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="whoop_workout_view_form" model="ir.ui.view">
+        <field name="name">whoop.workout.form</field>
+        <field name="model">whoop.workout</field>
+        <field name="arch" type="xml">
+            <form string="Workout" create="0">
+                <sheet>
+                    <div class="oe_title">
+                        <span class="badge text-bg-warning" invisible="not is_sample">Sample data</span>
+                        <h1><field name="sport_name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="start"/>
+                            <field name="end"/>
+                            <field name="duration_display"/>
+                            <field name="strain"/>
+                            <field name="average_heart_rate"/>
+                            <field name="max_heart_rate"/>
+                            <field name="calories"/>
+                            <field name="distance_mi"/>
+                            <field name="altitude_gain_ft"/>
+                        </group>
+                        <group string="Heart Rate Zones (minutes)">
+                            <field name="zone0_min"/>
+                            <field name="zone1_min"/>
+                            <field name="zone2_min"/>
+                            <field name="zone3_min"/>
+                            <field name="zone4_min"/>
+                            <field name="zone5_min"/>
+                            <field name="percent_recorded"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="whoop_workout_view_graph" model="ir.ui.view">
+        <field name="name">whoop.workout.graph</field>
+        <field name="model">whoop.workout</field>
+        <field name="arch" type="xml">
+            <graph string="Workout strain" type="bar">
+                <field name="date" interval="week"/>
+                <field name="strain" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="whoop_workout_view_calendar" model="ir.ui.view">
+        <field name="name">whoop.workout.calendar</field>
+        <field name="model">whoop.workout</field>
+        <field name="arch" type="xml">
+            <calendar string="Workouts" date_start="start" date_stop="end" mode="month" color="sport_name" create="0" quick_create="0">
+                <field name="strain"/>
+                <field name="duration_display"/>
+                <field name="calories"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="whoop_workout_view_search" model="ir.ui.view">
+        <field name="name">whoop.workout.search</field>
+        <field name="model">whoop.workout</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="sport_name"/>
+                <filter name="last_30" string="Last 30 Days" domain="[('date', '&gt;=', 'today -30d')]"/>
+                <filter name="filter_date" string="Date" date="date"/>
+                <separator/>
+                <filter name="sample" string="Sample Data" domain="[('is_sample', '=', True)]"/>
+                <group>
+                    <filter name="group_sport" string="Sport" context="{'group_by': 'sport_name'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="whoop_workout_action" model="ir.actions.act_window">
+        <field name="name">Workouts</field>
+        <field name="res_model">whoop.workout</field>
+        <field name="view_mode">list,calendar,graph,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No workouts yet</p>
+        </field>
+    </record>
+</odoo>

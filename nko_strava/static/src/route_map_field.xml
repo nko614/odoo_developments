@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="nko_strava.StravaRouteMapField">
+        <div class="o_nko_strava_route w-100">
+            <t t-if="this.points.length &gt; 1">
+                <div class="o_nko_strava_route_map rounded border" t-ref="this.mapRef"/>
+            </t>
+            <t t-else="">
+                <div class="o_nko_strava_route_empty rounded border text-muted d-flex align-items-center justify-content-center">
+                    <span>No GPS route for this activity (indoor, trainer or manual entry).</span>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

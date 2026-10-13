@@ -1,0 +1,39 @@
+<section class="container">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>Fitness Sync: Strava &amp; WHOOP</h2>
+      <p class="lead">Your training, recovery and sleep in Odoo, next to everything else you track.</p>
+      <img src="banner.png" alt="Fitness Sync" class="img-fluid" style="max-width:720px"/>
+    </div>
+  </div>
+</section>
+
+<section class="container mt-5">
+  <h3>What it syncs</h3>
+  <ul>
+    <li><b>Strava activities</b>: your full history, including sport, distance, moving/elapsed time, pace or speed, elevation, heart rate, power, calories, kudos, PRs, gear and device. Shown in miles/feet with pace per mile for runs and mph for rides; raw metric values are kept too.</li>
+    <li><b>Route maps</b>: every activity with GPS shows its route on an OpenStreetMap map with start and finish markers. A <b>Map</b> menu shows all your routes at once, filterable by sport and year.</li>
+    <li><b>Strava totals</b>: last 4 weeks, year to date and all time for run, ride and swim.</li>
+    <li><b>WHOOP</b>: recovery (score, HRV, resting heart rate, SpO2, skin temperature), sleep (performance, efficiency, stages, respiratory rate), daily strain and workouts. Recovery is color-coded green / yellow / red.</li>
+    <li>List, calendar, graph and pivot views for everything, e.g. distance by month and sport, or HRV over time.</li>
+  </ul>
+
+  <h3>Setup (about 2 minutes)</h3>
+  <ol>
+    <li><b>Strava:</b> at <a href="https://www.strava.com/settings/api">strava.com/settings/api</a>, create an API application and set the <i>Authorization Callback Domain</i> to your Odoo domain (shown in the app's settings).</li>
+    <li><b>WHOOP:</b> at <a href="https://developer-dashboard.whoop.com">developer-dashboard.whoop.com</a>, create an app with the read scopes plus <i>offline</i>, and add the Redirect URI shown in the app's settings.</li>
+    <li>In Odoo, open <b>Fitness Sync &rarr; Configuration &rarr; Settings</b>, paste each Client ID and Client Secret, and save.</li>
+    <li>Click <b>Connect Strava</b> and <b>Connect WHOOP</b> and approve. The first sync starts right away; after that, data syncs every hour, or on demand with <b>Sync Now</b>.</li>
+  </ol>
+
+  <h3>Built to keep your connection alive</h3>
+  <p>WHOOP invalidates the previous refresh token every time a new one is issued. This module refreshes tokens only when they have actually expired, saves a new token before using it (so a failed sync can't lose it), and lets only one process refresh at a time. If a provider rejects the connection, it is marked <i>Reconnect needed</i> instead of retrying in a loop.</p>
+
+  <h3>Notes</h3>
+  <ul>
+    <li>Requires the Python <code>requests</code> library (included with Odoo).</li>
+    <li>Client secrets and tokens are visible to Settings administrators only.</li>
+    <li>Map tiles are loaded from OpenStreetMap; the Leaflet library is bundled with the module.</li>
+    <li>Compatible with Strava and WHOOP. Not affiliated with, endorsed by, or sponsored by Strava, Inc. or WHOOP, Inc. Strava and WHOOP are trademarks of their respective owners.</li>
+  </ul>
+</section>

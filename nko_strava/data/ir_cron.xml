@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_nko_strava_sync" model="ir.cron">
+        <field name="name">Strava / WHOOP: hourly sync of connected accounts</field>
+        <field name="model_id" ref="model_fitness_connection"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+    </record>
+</odoo>

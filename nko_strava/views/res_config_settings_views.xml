@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.nko_strava</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="95"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Fitness Sync" id="nko_strava" string="Fitness Sync" name="nko_strava" groups="base.group_system">
+                    <field name="nko_strava_state" invisible="1"/>
+                    <field name="nko_whoop_state" invisible="1"/>
+                    <block title="Strava" id="nko_strava_strava">
+                        <setting id="nko_strava_api" string="Strava API application"
+                                 help="Create an app at strava.com/settings/api, set its Authorization Callback Domain to the domain below, then paste the Client ID and Secret here and Save.">
+                            <div class="content-group mt16">
+                                <div class="row">
+                                    <label string="Client ID" for="nko_strava_client_id" class="col-lg-4 o_light_label"/>
+                                    <field name="nko_strava_client_id" placeholder="e.g. 123456"/>
+                                </div>
+                                <div class="row">
+                                    <label string="Client Secret" for="nko_strava_client_secret" class="col-lg-4 o_light_label"/>
+                                    <field name="nko_strava_client_secret" password="True"/>
+                                </div>
+                                <div class="row">
+                                    <label string="Callback Domain" for="nko_strava_callback_domain" class="col-lg-4 o_light_label"/>
+                                    <field name="nko_strava_callback_domain" widget="CopyClipboardChar" readonly="1"/>
+                                </div>
+                                <div class="mt8">
+                                    <label string="Redirect URI" for="nko_strava_redirect_uri" class="o_light_label"/>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <field name="nko_strava_redirect_uri" readonly="1" class="text-break font-monospace small"/>
+                                        <field name="nko_strava_redirect_uri" widget="CopyClipboardButton" readonly="1" string="Copy"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting id="nko_strava_connection" string="Strava connection">
+                            <div class="content-group mt8">
+                                <div class="fw-bold" invisible="nko_strava_state != 'connected'"><field name="nko_strava_status" readonly="1" class="text-success"/></div>
+                                <div class="fw-bold" invisible="nko_strava_state == 'connected'"><field name="nko_strava_status" readonly="1" class="text-muted"/></div>
+                                <div class="text-danger small" invisible="not nko_strava_error"><field name="nko_strava_error" readonly="1"/></div>
+                                <div class="mt8 d-flex gap-2 flex-wrap">
+                                    <button name="action_nko_strava_connect" type="object" class="btn-primary" icon="link"
+                                            string="Connect Strava" invisible="nko_strava_state == 'connected'"/>
+                                    <button name="action_nko_strava_sync" type="object" class="btn-secondary" icon="refresh"
+                                            string="Sync Now" invisible="nko_strava_state != 'connected'"/>
+                                    <button name="action_nko_strava_connect" type="object" class="btn-link" icon="link"
+                                            string="Reconnect" invisible="nko_strava_state != 'connected'"/>
+                                    <button name="action_nko_strava_disconnect" type="object" class="btn-link text-danger" icon="link_off"
+                                            string="Disconnect" invisible="nko_strava_state == 'disconnected'"
+                                            confirm="Disconnect Strava? Synced activities are kept; you can reconnect any time."/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="WHOOP" id="nko_strava_whoop">
+                        <setting id="nko_whoop_api" string="WHOOP API application"
+                                 help="Create an app at developer-dashboard.whoop.com with all read scopes + offline, add the Redirect URI below exactly as shown, then paste the Client ID and Secret here and Save.">
+                            <div class="content-group mt16">
+                                <div class="row">
+                                    <label string="Client ID" for="nko_whoop_client_id" class="col-lg-4 o_light_label"/>
+                                    <field name="nko_whoop_client_id"/>
+                                </div>
+                                <div class="row">
+                                    <label string="Client Secret" for="nko_whoop_client_secret" class="col-lg-4 o_light_label"/>
+                                    <field name="nko_whoop_client_secret" password="True"/>
+                                </div>
+                                <div class="mt8">
+                                    <label string="Redirect URI" for="nko_whoop_redirect_uri" class="o_light_label"/>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <field name="nko_whoop_redirect_uri" readonly="1" class="text-break font-monospace small"/>
+                                        <field name="nko_whoop_redirect_uri" widget="CopyClipboardButton" readonly="1" string="Copy"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting id="nko_whoop_connection" string="WHOOP connection">
+                            <div class="content-group mt8">
+                                <div class="fw-bold" invisible="nko_whoop_state != 'connected'"><field name="nko_whoop_status" readonly="1" class="text-success"/></div>
+                                <div class="fw-bold" invisible="nko_whoop_state == 'connected'"><field name="nko_whoop_status" readonly="1" class="text-muted"/></div>
+                                <div class="text-danger small" invisible="not nko_whoop_error"><field name="nko_whoop_error" readonly="1"/></div>
+                                <div class="mt8 d-flex gap-2 flex-wrap">
+                                    <button name="action_nko_whoop_connect" type="object" class="btn-primary" icon="link"
+                                            string="Connect WHOOP" invisible="nko_whoop_state == 'connected'"/>
+                                    <button name="action_nko_whoop_sync" type="object" class="btn-secondary" icon="refresh"
+                                            string="Sync Now" invisible="nko_whoop_state != 'connected'"/>
+                                    <button name="action_nko_whoop_connect" type="object" class="btn-link" icon="link"
+                                            string="Reconnect" invisible="nko_whoop_state != 'connected'"/>
+                                    <button name="action_nko_whoop_disconnect" type="object" class="btn-link text-danger" icon="link_off"
+                                            string="Disconnect" invisible="nko_whoop_state == 'disconnected'"
+                                            confirm="Disconnect WHOOP? Synced data is kept; you can reconnect any time."/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="nko_strava_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'nko_strava'}</field>
+    </record>
+</odoo>

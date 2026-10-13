@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_nko_strava_root" name="Fitness Sync" sequence="91" web_icon="nko_strava,static/description/icon.png"/>
+    <menuitem id="menu_nko_strava_activities" name="Activities" parent="menu_nko_strava_root" action="strava_activity_action" sequence="10"/>
+    <menuitem id="menu_nko_strava_map" name="Map" parent="menu_nko_strava_root" action="strava_activity_map_action" sequence="20"/>
+    <menuitem id="menu_nko_strava_stats" name="Stats" parent="menu_nko_strava_root" sequence="30">
+        <menuitem id="menu_nko_strava_stats_analysis" name="Activity Analysis" action="strava_activity_stats_action" sequence="10"/>
+        <menuitem id="menu_nko_strava_stats_totals" name="Strava Totals" action="strava_athlete_stat_action" sequence="20"/>
+    </menuitem>
+    <menuitem id="menu_nko_strava_whoop" name="WHOOP" parent="menu_nko_strava_root" sequence="40">
+        <menuitem id="menu_nko_strava_whoop_recovery" name="Recovery" action="whoop_recovery_action" sequence="10"/>
+        <menuitem id="menu_nko_strava_whoop_sleep" name="Sleep" action="whoop_sleep_action" sequence="20"/>
+        <menuitem id="menu_nko_strava_whoop_strain" name="Strain" action="whoop_cycle_action" sequence="30"/>
+        <menuitem id="menu_nko_strava_whoop_workouts" name="Workouts" action="whoop_workout_action" sequence="40"/>
+    </menuitem>
+    <menuitem id="menu_nko_strava_config" name="Configuration" parent="menu_nko_strava_root" sequence="90" groups="base.group_system">
+        <menuitem id="menu_nko_strava_settings" name="Settings" action="nko_strava_settings_action" sequence="10"/>
+        <menuitem id="menu_nko_strava_connections" name="Connections" action="fitness_connection_action" sequence="20"/>
+    </menuitem>
+</odoo>
