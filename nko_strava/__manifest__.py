@@ -23,7 +23,12 @@
             'nko_strava/static/src/**/*',
         ],
     },
-    'images': ['static/description/banner.png'],
+    'images': [
+        'static/description/banner.png',
+        'static/description/screenshot_activities.png',
+        'static/description/screenshot_sleep.png',
+        'static/description/screenshot_sleep_trend.png',
+    ],
     'application': True,
     'license': 'LGPL-3',
     'price': 0.0,
