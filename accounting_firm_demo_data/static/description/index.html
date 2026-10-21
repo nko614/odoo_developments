@@ -1,0 +1,53 @@
+<section class="container">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>Accounting Firm Demo Data</h2>
+      <p class="lead">Install one module and get a believable accounting firm: client databases with KPIs, engagements, timesheets and the firm's own books, all dated around today.</p>
+      <img src="banner.png" alt="Accounting Firm Demo Data" class="img-fluid" style="max-width:720px"/>
+    </div>
+  </div>
+</section>
+
+<section class="container mt-5">
+  <div class="alert alert-warning">
+    <b>Use a demo or test database.</b> This module posts invoices, bills, payments and journal entries in the
+    company's books. Do not install it on a production database.
+  </div>
+
+  <h3>What you get</h3>
+  <ul>
+    <li><b>28 client databases</b> in the Databases app (Odoo Online, Odoo.sh, On Premise and Outside of Odoo), each with users, Documents inbox count, journal KPIs (Bank, Sales, Purchase, Miscellaneous), tax return statuses and to-dos. Two clients are tagged Unreachable.</li>
+    <li><b>6 staff members</b> as employees with hourly costs. No new users are created, so no extra user licenses.</li>
+    <li><b>9 service products</b>: fixed-fee bookkeeping, quarterly close, sales tax, payroll filings, 1099s, year-end and onboarding, plus hourly catch-up and advisory work.</li>
+    <li><b>62 sales orders</b>: last quarter's engagements (invoiced, mostly paid), this quarter's engagements and upsell quotations.</li>
+    <li><b>238 tasks and about 800 timesheet entries</b> linked to sales order lines, so <i>Estimated Costs</i>, <i>Real Costs</i> and the project margin buttons show real numbers.</li>
+    <li><b>The firm's own books</b>: client invoices and vendor bills in every state (draft, to review, anomaly, posted, paid, overdue), 37 unreconciled bank lines (five match open invoices, ready for a reconciliation demo), miscellaneous entries and follow-up activities.</li>
+    <li><b>Sample bills in the Documents inbox</b> when the Documents app is installed.</li>
+  </ul>
+
+  <h3>Screenshots</h3>
+  <p><b>Databases app</b>: every client with its KPIs (columns switched on from the column menu).</p>
+  <img src="screenshot_databases.png" alt="Databases list with KPI columns" class="img-fluid border mb-4"/>
+  <p><b>A client record</b>: connection details, fetch switches and the users found on the client.</p>
+  <img src="screenshot_client_database.png" alt="Client database tab" class="img-fluid border mb-4"/>
+  <p><b>Engagement profitability</b>: sales, estimated costs, real costs, invoices and timesheets per client.</p>
+  <img src="screenshot_profitability.png" alt="Project profitability buttons" class="img-fluid border mb-4"/>
+  <p><b>The firm's vendor bills</b>: drafts, bills to review and paid bills.</p>
+  <img src="screenshot_bills.png" alt="Vendor bills" class="img-fluid border mb-4"/>
+
+  <h3>Requirements</h3>
+  <ul>
+    <li>Odoo 20 <b>Enterprise</b> (the Databases app is an Enterprise app): Odoo.sh or on-premise.</li>
+    <li>Depends only on standard modules: <i>Databases</i>, <i>Sales Timesheet</i> and <i>Sales Project Margin</i>. Accounting is installed through them.</li>
+    <li>Works with any chart of accounts. Lines are created without taxes so no localization is assumed.</li>
+  </ul>
+
+  <h3>How it behaves</h3>
+  <ul>
+    <li>Data is loaded <b>once</b>, at install. Upgrading the module does not load it again.</li>
+    <li>All dates are relative to the install date, and task and order names use the matching months and quarters.</li>
+    <li>The client database URLs are fictional (<i>.example</i>), and the daily synchronization job skips them. Clicking Synchronize on one of them reports it as unreachable.</li>
+    <li>Your company name, settings and scheduled actions are not changed.</li>
+    <li>Uninstalling the module leaves the demo records in place, like standard demo data. Installing it again does not create duplicates.</li>
+  </ul>
+</section>
