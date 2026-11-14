@@ -32,6 +32,7 @@ class AccountAnalyticLine(models.Model):
                 if not vals.get('partner_id'):
                     vals['partner_id'] = repair.partner_id.commercial_partner_id.id
                 if vals.get('product_id'):
+                    vals.setdefault('employee_id', False)  # parts, not time: skip hr_timesheet's default employee
                     continue
                 if not vals.get('project_id'):
                     vals['project_id'] = project.id

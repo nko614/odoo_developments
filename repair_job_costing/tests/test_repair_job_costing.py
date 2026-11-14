@@ -160,6 +160,25 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
         self.assertEqual(lines.repair_product_id, bike)
         self.assertFalse(self._account_lines(product_id=self.part.id).filtered('repair_id').project_id)
 
+    def test_part_lines_are_not_timesheets(self):
+        self.env.user.group_ids |= self.env.ref('hr_timesheet.group_hr_timesheet_user')
+        self.env['stock.quant']._update_available_quantity(self.part, self.order.warehouse_id.lot_stock_id, 5)
+        technician = self.env['hr.employee'].sudo().create({
+            'name': "Technician", 'hourly_cost': 40.0, 'user_id': self.env.user.id})
+        self.repair.write({
+            'move_ids': [Command.create({'product_id': self.part.id, 'product_uom_qty': 1.0, 'repair_line_type': 'add'})],
+            'timesheet_ids': [Command.create({'name': "Work", 'unit_amount': 2.0, 'employee_id': technician.id})],
+        })
+        self.repair.move_ids.write({'quantity': 1.0, 'picked': True})
+        self.repair.action_repair_end()
+
+        part_line = self._account_lines(product_id=self.part.id).filtered('repair_id')
+        self.assertEqual(part_line.amount, -20.0)
+        self.assertFalse(part_line.employee_id)
+        self.assertEqual(self.repair.timesheet_ids.mapped('name'), ["Work"])
+        self.assertEqual(self.repair.timesheet_hours, 2.0)
+        self.assertEqual(self.repair.timesheet_cost, 80.0)
+
     def test_repair_margin_grouped_by_customer(self):
         other_customer = self.env['res.partner'].create({'name': "Hillside Cycles"})
         orders = self.order | self._confirm_order(self.customer) | self._confirm_order(other_customer)

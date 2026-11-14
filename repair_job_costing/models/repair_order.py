@@ -16,7 +16,7 @@ class RepairOrder(models.Model):
     currency_id = fields.Many2one(related='company_id.currency_id')
     photo_ids = fields.Many2many('ir.attachment', string="Photos")
     timesheet_ids = fields.One2many(
-        'account.analytic.line', 'repair_id', string="Timesheets",
+        'account.analytic.line', 'repair_id', string="Timesheets", domain=[('project_id', '!=', False)],
         groups='hr_timesheet.group_hr_timesheet_user')
     timesheet_hours = fields.Float(
         "Hours Spent", compute='_compute_timesheet_totals', groups='hr_timesheet.group_hr_timesheet_user')
@@ -25,16 +25,10 @@ class RepairOrder(models.Model):
 
     @api.depends('timesheet_ids.unit_amount', 'timesheet_ids.amount')
     def _compute_timesheet_totals(self):
-        totals = {
-            repair.id: (hours, amount)
-            for repair, hours, amount in self.env['account.analytic.line']._read_group(
-                [('repair_id', 'in', self.ids)], ['repair_id'], ['unit_amount:sum', 'amount:sum'])
-        }
         for repair in self:
-            hours, amount = totals.get(repair.id, (0.0, 0.0))
-            repair.timesheet_hours = hours
+            repair.timesheet_hours = sum(repair.timesheet_ids.mapped('unit_amount'))
             # Timesheet amounts are costs, stored as negative numbers.
-            repair.timesheet_cost = -amount
+            repair.timesheet_cost = -sum(repair.timesheet_ids.mapped('amount'))
 
     def _compute_access_url(self):
         super()._compute_access_url()
