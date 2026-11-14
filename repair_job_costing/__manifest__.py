@@ -1,6 +1,6 @@
 {
     'name': 'Repair Job Costing',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Supply Chain/Inventory',
     'summary': 'Repair stages, photos, timesheets, gross margin per sale order and a customer portal page',
     'description': """
@@ -23,6 +23,7 @@ Adds job costing and customer follow-up to the Repairs app:
         'views/repair_stage_views.xml',
         'views/repair_order_views.xml',
         'views/sale_order_views.xml',
+        'views/account_analytic_line_views.xml',
         'views/repair_portal_templates.xml',
     ],
     'assets': {

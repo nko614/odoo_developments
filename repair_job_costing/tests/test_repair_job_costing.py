@@ -1,3 +1,5 @@
+import ast
+
 from odoo.exceptions import AccessError, UserError
 from odoo.fields import Command
 from odoo.tests import HttpCase, new_test_user, tagged
@@ -35,6 +37,14 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
         cls.order.action_confirm()
         cls.repair = cls.order.repair_order_ids
         cls.account = cls.order.analytic_account_id
+
+    def _confirm_order(self, partner):
+        order = self.env['sale.order'].create({
+            'partner_id': partner.id,
+            'order_line': [Command.create({'product_id': self.repair_product.id})],
+        })
+        order.action_confirm()
+        return order
 
     def _account_lines(self, **domain):
         return self.env['account.analytic.line'].sudo().search(
@@ -130,6 +140,35 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
             'product_id': self.part.id, 'product_uom_qty': 1.0, 'repair_line_type': 'add'})]})
         with self.assertRaises(UserError):
             self.repair.stage_id = self.env.ref('repair_job_costing.repair_stage_ready_for_pickup')
+
+    def test_repair_lines_carry_customer_and_repaired_product(self):
+        bike = self.env['product.product'].create({'name': "City Bike"})
+        self.repair.product_id = bike
+        self.env['stock.quant']._update_available_quantity(self.part, self.order.warehouse_id.lot_stock_id, 5)
+        technician = self.env['hr.employee'].sudo().create({'name': "Technician", 'hourly_cost': 40.0})
+        self.repair.write({'move_ids': [Command.create({
+            'product_id': self.part.id, 'product_uom_qty': 1.0, 'repair_line_type': 'add'})]})
+        self.env['account.analytic.line'].sudo().create({
+            'repair_id': self.repair.id, 'employee_id': technician.id, 'unit_amount': 1.0, 'name': "Work"})
+        self.repair.move_ids.write({'quantity': 1.0, 'picked': True})
+        self.repair.action_repair_done()
+        self.order._create_invoices().action_post()
+
+        lines = self._account_lines()
+        self.assertEqual(len(lines), 4)  # repair and part invoiced, part cost, labor
+        self.assertEqual(lines.partner_id, self.customer)
+        self.assertEqual(lines.repair_product_id, bike)
+        self.assertFalse(self._account_lines(product_id=self.part.id).filtered('repair_id').project_id)
+
+    def test_repair_margin_grouped_by_customer(self):
+        other_customer = self.env['res.partner'].create({'name': "Hillside Cycles"})
+        orders = self.order | self._confirm_order(self.customer) | self._confirm_order(other_customer)
+        for order in orders:
+            order._create_invoices().action_post()
+        domain = ast.literal_eval(self.env.ref('repair_job_costing.account_analytic_line_action_repair_margin').domain)
+        totals = dict(self.env['account.analytic.line']._read_group(domain, ['partner_id'], ['amount:sum']))
+        self.assertEqual(totals[self.customer], 300.0)
+        self.assertEqual(totals[other_customer], 150.0)
 
 
 @tagged('post_install', '-at_install')

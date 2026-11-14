@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_analytic_line_filter_inherit_account" model="ir.ui.view">
+        <field name="name">account.analytic.line.select.inherit.repair_job_costing</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="account.view_account_analytic_line_filter_inherit_account"/>
+        <field name="arch" type="xml">
+            <filter name="partner" position="after">
+                <filter string="Repaired Product" name="repair_product" context="{'group_by': 'repair_product_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <!-- Revenue, labor and parts of repairs: invoice lines of sale orders with repairs, and
+         the timesheet and part lines of repairs. -->
+    <record id="account_analytic_line_action_repair_margin" model="ir.actions.act_window">
+        <field name="name">Repair Margin</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">pivot,list,graph</field>
+        <field name="search_view_id" ref="account.view_account_analytic_line_filter_inherit_account"/>
+        <field name="domain">['|', ('repair_id', '!=', False), ('move_line_id.sale_line_ids.order_id.repair_order_ids', '!=', False)]</field>
+        <field name="context">{'pivot_row_groupby': ['partner_id', 'repair_product_id'], 'pivot_column_groupby': ['category'], 'pivot_measures': ['amount']}</field>
+    </record>
+
+    <menuitem id="repair_margin_menu" name="Repair Margin" parent="repair.repair_menu_reporting"
+              action="account_analytic_line_action_repair_margin" sequence="20"/>
+</odoo>
