@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_repair_order_form" model="ir.ui.view">
+        <field name="name">repair.form.inherit.repair_job_costing</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"/>
+            </field>
+            <field name="state" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="user_id" position="after">
+                <field name="analytic_account_id" groups="analytic.group_analytic_accounting" invisible="not analytic_account_id"/>
+            </field>
+            <page name="repair_notes" position="before">
+                <page string="Photos" name="photos">
+                    <field name="photo_ids" widget="repair_photos" nolabel="1"/>
+                </page>
+                <page string="Timesheets" name="timesheets" groups="hr_timesheet.group_hr_timesheet_user">
+                    <field name="timesheet_ids" context="{'default_name': ''}">
+                        <list editable="bottom">
+                            <field name="date"/>
+                            <field name="employee_id" widget="many2one_avatar_employee" required="1" context="{'active_test': True}"/>
+                            <field name="name" required="0"/>
+                            <field name="unit_amount" string="Time Spent" widget="timesheet_uom"/>
+                            <field name="company_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="timesheet_hours" widget="timesheet_uom"/>
+                        <field name="timesheet_cost"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="view_repair_order_tree" model="ir.ui.view">
+        <field name="name">repair.list.inherit.repair_job_costing</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="stage_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_repair_kanban" model="ir.ui.view">
+        <field name="name">repair.kanban.inherit.repair_job_costing</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_kanban"/>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="default_group_by">stage_id</attribute>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_repair_order_form_filter" model="ir.ui.view">
+        <field name="name">repair.select.inherit.repair_job_costing</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form_filter"/>
+        <field name="arch" type="xml">
+            <filter name="status" position="before">
+                <filter string="Stage" name="stage" context="{'group_by': 'stage_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="repair_job_costing.RepairPhotosField">
+        <div class="d-flex flex-wrap align-items-start gap-2">
+            <div t-foreach="this.files" t-as="file" t-key="file.id" class="position-relative">
+                <img t-attf-src="/web/image/{{ file.id }}/160x160?crop=1" width="160" height="160"
+                     class="rounded border object-fit-cover" role="button"
+                     t-att-alt="file.name" t-att-title="file.name" t-on-click="() => this.openPhoto(file)"/>
+                <button t-if="!this.props.readonly" class="btn btn-sm btn-light position-absolute top-0 end-0 m-1"
+                        title="Remove" t-on-click="() => this.onFileRemove(file.id)">
+                    <i class="oi" data-icon="close"/>
+                </button>
+            </div>
+            <FileInput t-if="!this.props.readonly" acceptedFileExtensions="'image/*'" multiUpload="true"
+                       onUpload.bind="this.onFileUploaded" resModel="this.props.record.resModel"
+                       resId="this.props.record.resId or 0">
+                <button class="btn btn-secondary"><i class="oi" data-icon="photo_camera"/> Add Photos</button>
+            </FileInput>
+        </div>
+    </t>
+</templates>

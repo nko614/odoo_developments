@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="repair_stage_new" model="repair.stage">
+        <field name="name">Received</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="repair_stage_in_progress" model="repair.stage">
+        <field name="name">In Repair</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="repair_stage_ready_for_pickup" model="repair.stage">
+        <field name="name">Ready for Pickup</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Timesheets logged on repairs belong to this project. Internal users only, so they
+         never show in the customer portal. -->
+    <record id="project_repairs" model="project.project">
+        <field name="name">Repairs</field>
+        <field name="privacy_visibility">employees</field>
+        <field name="allow_timesheets" eval="True"/>
+    </record>
+
+    <record id="portal_repairs" model="portal.entry">
+        <field name="name">Repairs</field>
+        <field name="description">Follow the repairs of your products</field>
+        <field name="url">/my/repairs</field>
+        <field name="image" type="bytes" file="repair/static/description/icon.svg"/>
+        <field name="placeholder_count">repair_count</field>
+        <field name="category">service_category</field>
+        <field name="sequence" eval="120"/>
+    </record>
+</odoo>

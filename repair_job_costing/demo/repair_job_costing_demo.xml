@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="demo_customer" model="res.partner">
+        <field name="name">Lakeside Bikes</field>
+        <field name="is_company" eval="True"/>
+        <field name="email">service@lakeside-bikes.example.com</field>
+    </record>
+    <record id="demo_portal_user" model="res.users">
+        <field name="name">Lakeside Bikes Portal</field>
+        <field name="login">lakeside</field>
+        <field name="password">lakeside</field>
+        <field name="email">service@lakeside-bikes.example.com</field>
+        <field name="parent_id" ref="demo_customer"/>
+        <field name="group_ids" eval="[Command.set([ref('base.group_portal')])]"/>
+    </record>
+
+    <record id="demo_product_repair" model="product.product">
+        <field name="name">Bike Repair</field>
+        <field name="type">service</field>
+        <field name="service_tracking">repair</field>
+        <field name="list_price">150.0</field>
+    </record>
+    <record id="demo_product_part" model="product.product">
+        <field name="name">Brake Pad Set</field>
+        <field name="is_storable" eval="True"/>
+        <field name="standard_price">20.0</field>
+        <field name="list_price">35.0</field>
+    </record>
+
+    <record id="hr.employee_admin" model="hr.employee">
+        <field name="hourly_cost">40.0</field>
+    </record>
+</odoo>

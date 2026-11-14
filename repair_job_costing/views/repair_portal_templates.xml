@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_menu_repair" name="Portal layout: repair menu entries" inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'repair'" t-attf-class="breadcrumb-item #{'active' if not repair else ''}">
+                <a t-if="repair" href="/my/repairs">Repairs</a>
+                <t t-else="">Repairs</t>
+            </li>
+            <li t-if="page_name == 'repair' and repair" class="breadcrumb-item active" t-out="repair.name"/>
+        </xpath>
+    </template>
+
+    <!-- Stage badge: green on the last stage, grey when cancelled, blue otherwise. -->
+    <template id="portal_repair_badge" name="Repair Stage Badge">
+        <span t-attf-class="badge rounded-pill fs-6 fw-normal #{'text-bg-secondary' if repair.state == 'cancel' else 'text-bg-success' if repair.stage_id == repair_stages[-1:] else 'text-bg-info'}">
+            <t t-if="repair.state == 'cancel'">Cancelled</t>
+            <t t-else="" t-out="repair.stage_id.name"/>
+        </span>
+    </template>
+
+    <template id="portal_my_repairs" name="My Repairs">
+        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
+            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="Repairs"/>
+            <p t-if="not repairs" class="alert alert-info">There are no repairs for your account yet.</p>
+            <div t-else="" class="list-group shadow-sm">
+                <a t-foreach="repairs" t-as="repair" t-att-href="repair.access_url"
+                   class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+                    <span class="d-none d-sm-flex align-items-center justify-content-center rounded-circle bg-light text-primary flex-shrink-0" style="width: 3rem; height: 3rem;">
+                        <i class="oi fs-4" data-icon="build"/>
+                    </span>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="fw-bold" t-out="repair.name"/>
+                        <div class="text-muted small text-truncate">
+                            <t t-out="repair.product_id.display_name or repair.sale_order_id.name"/>
+                            <t t-if="repair.lot_id">, serial number <t t-out="repair.lot_id.name"/></t>
+                        </div>
+                        <div class="text-muted small">
+                            Scheduled <span t-field="repair.schedule_date" t-options="{'widget': 'date'}"/>
+                        </div>
+                    </div>
+                    <t t-call="repair_job_costing.portal_repair_badge"/>
+                </a>
+            </div>
+            <div t-if="pager" class="o_portal_pager d-flex justify-content-center my-3">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_repair" name="My Repair" inherit_id="portal.portal_sidebar" primary="True">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <div class="row mt-3">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+                                <div>
+                                    <div class="text-muted small">Repair</div>
+                                    <h2 class="mb-1" t-out="repair.name"/>
+                                    <div t-if="repair.product_id" class="text-muted" t-out="repair.product_id.display_name"/>
+                                </div>
+                                <t t-call="repair_job_costing.portal_repair_badge"/>
+                            </div>
+
+                            <div t-if="repair.state == 'cancel'" class="alert alert-secondary mb-0">This repair was cancelled.</div>
+                            <div t-else="" class="d-flex align-items-start">
+                                <t t-set="current_index" t-value="repair_stages.ids.index(repair.stage_id.id) if repair.stage_id in repair_stages else -1"/>
+                                <t t-foreach="repair_stages" t-as="stage">
+                                    <div t-if="not stage_first" t-attf-class="flex-grow-1 border-top border-2 mt-3 mx-1 #{'border-primary' if stage_index &lt;= current_index else ''}"/>
+                                    <div class="text-center flex-shrink-0" style="width: 6rem;">
+                                        <span t-attf-class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold #{'bg-primary text-white' if stage_index &lt;= current_index else 'bg-light text-muted border'}" style="width: 2rem; height: 2rem;">
+                                            <i t-if="stage_index &lt; current_index" class="oi" data-icon="check"/>
+                                            <t t-else="" t-out="stage_index + 1"/>
+                                        </span>
+                                        <div t-attf-class="small mt-1 #{'fw-bold' if stage_index == current_index else 'text-muted'}" t-out="stage.name"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <t t-call="portal.message_thread"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-transparent fw-bold">Details</div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Customer</span><span class="text-end" t-out="repair.partner_id.display_name"/>
+                            </li>
+                            <li t-if="repair.product_id" class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Product</span><span class="text-end" t-out="repair.product_id.display_name"/>
+                            </li>
+                            <li t-if="repair.lot_id" class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Serial number</span><span class="text-end" t-out="repair.lot_id.name"/>
+                            </li>
+                            <li t-if="repair.sale_order_id" class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Sale order</span>
+                                <a t-att-href="repair.sale_order_id.access_url" t-out="repair.sale_order_id.name"/>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Scheduled</span>
+                                <span t-field="repair.schedule_date" t-options="{'widget': 'date'}"/>
+                            </li>
+                            <li t-if="repair.user_id" class="list-group-item d-flex justify-content-between gap-3">
+                                <span class="text-muted">Handled by</span><span class="text-end" t-out="repair.user_id.name"/>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

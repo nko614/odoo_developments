@@ -1,0 +1,47 @@
+<section class="container">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>Repair Job Costing</h2>
+      <p class="lead">Adds stages, photos, timesheets and job costing to the Repairs app, with one analytic account per sale order and a portal page where customers follow their repairs.</p>
+      <img src="banner.png" alt="Repair Job Costing" class="img-fluid" style="max-width:720px"/>
+    </div>
+  </div>
+</section>
+
+<section class="container mt-5">
+  <h3>What it does</h3>
+  <ul>
+    <li><b>One analytic account per sale order.</b> When a sale order with a repair product is confirmed, Odoo creates the repair (standard) and this module gives the order its own analytic account. The order lines, the timesheets logged on the repair and the cost of the parts used on the repair are all posted to it.</li>
+    <li><b>Gross Margin button on the sale order.</b> Shows the balance of the order's analytic account. Clicking it lists the revenue and cost lines, grouped by category.</li>
+    <li><b>Timesheets tab on the repair.</b> Technicians log their time on the repair. The tab shows the hours and the labor cost, based on each employee's hourly cost.</li>
+    <li><b>Photos tab on the repair.</b> Several photos per repair, for example at intake and when finished. On a phone or tablet the Add Photos button opens the camera. Click a photo to see it full size.</li>
+    <li><b>Repair stages.</b> Received, In Repair and Ready for Pickup by default, editable under Repairs &gt; Configuration &gt; Stages. Stage changes are logged in the chatter and the kanban view is grouped by stage. Ending a repair moves it to Ready for Pickup, and moving a repair to Ready for Pickup ends it.</li>
+    <li><b>Customer portal.</b> Customers see their own repairs under My Account, with the stage, the sale order, the scheduled date, and a message thread with your team. Costs, timesheets, internal notes and photos are not shown.</li>
+  </ul>
+
+  <h3>Screenshots</h3>
+  <p><b>Repair with its timesheets</b>: hours and labor cost, and the analytic account of the sale order.</p>
+  <img src="screenshot_repair_timesheets.png" alt="Repair timesheets tab" class="img-fluid border mb-4"/>
+  <p><b>Repair photos</b>: thumbnails that open full size.</p>
+  <img src="screenshot_repair_photos.png" alt="Repair photos tab" class="img-fluid border mb-4"/>
+  <p><b>Gross margin of a sale order</b>: invoiced revenue, parts and labor on one account.</p>
+  <img src="screenshot_gross_margin.png" alt="Gross Margin button and analytic lines" class="img-fluid border mb-4"/>
+  <p><b>Repairs by stage.</b></p>
+  <img src="screenshot_kanban.png" alt="Repair kanban by stage" class="img-fluid border mb-4"/>
+  <p><b>The customer's repair page</b> in the portal.</p>
+  <img src="screenshot_portal.png" alt="Portal repair page" class="img-fluid border mb-4"/>
+
+  <h3>Setup</h3>
+  <ul>
+    <li>Turn on <i>Analytic Accounting</i> in the Accounting settings to see the analytic account and the Gross Margin button.</li>
+    <li>Set an <i>Hourly Cost</i> on the employees who log time on repairs. Without it, labor is posted at zero.</li>
+    <li>On the product you sell for repairs: product type Service, <i>Create on Order</i> set to Repair Order.</li>
+    <li>Parts cost is taken from the stock move value. Periodic valuation is enough; real-time valuation is not needed.</li>
+  </ul>
+
+  <h3>Requirements</h3>
+  <ul>
+    <li>Odoo 20, Community or Enterprise.</li>
+    <li>Depends only on standard modules: <i>Repairs</i>, <i>Timesheets</i> and <i>Project Stock Account</i>. Sales, Inventory and Invoicing are installed through them.</li>
+  </ul>
+</section>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.repair_job_costing</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_analytic_lines" type="object" class="oe_stat_button" icon="attach_money"
+                        invisible="not analytic_account_id" groups="analytic.group_analytic_accounting">
+                    <field name="analytic_balance" widget="statinfo"/>
+                </button>
+            </div>
+            <group name="sale_info" position="inside">
+                <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+            </group>
+        </field>
+    </record>
+</odoo>
