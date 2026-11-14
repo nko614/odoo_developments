@@ -4,3 +4,4 @@ from . import strava_athlete_stat
 from . import whoop
 from . import res_config_settings
 from . import sample_data
+from . import fitness_insight

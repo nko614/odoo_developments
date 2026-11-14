@@ -1,6 +1,6 @@
 {
     'name': 'Fitness Sync: Strava & WHOOP',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'summary': 'Sync your Strava activities and WHOOP recovery, sleep and strain into Odoo, with route maps',
     'author': 'Nicholas Kosinski',
     'maintainer': 'Nicholas Kosinski',
@@ -14,6 +14,7 @@
         'views/strava_activity_views.xml',
         'views/strava_athlete_stat_views.xml',
         'views/whoop_views.xml',
+        'views/fitness_insight_views.xml',
         'views/res_config_settings_views.xml',
         'views/menus.xml',
         'data/ir_cron.xml',

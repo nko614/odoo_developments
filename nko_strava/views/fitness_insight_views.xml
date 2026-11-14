@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================== Recovery vs. Performance ===================== -->
+    <record id="fitness_activity_insight_view_list" model="ir.ui.view">
+        <field name="name">fitness.activity.insight.list</field>
+        <field name="model">fitness.activity.insight</field>
+        <field name="arch" type="xml">
+            <list string="Activity vs. Recovery" create="0" edit="0" delete="0"
+                  decoration-success="recovery_zone == 'green'"
+                  decoration-warning="recovery_zone == 'yellow'"
+                  decoration-danger="recovery_zone == 'red'">
+                <field name="activity_date"/>
+                <field name="name"/>
+                <field name="sport_group"/>
+                <field name="time_of_day" optional="hide"/>
+                <field name="distance_mi"/>
+                <field name="pace_min_mi" widget="float_time" options="{'unit': 'minutes', 'show_seconds': True}"/>
+                <field name="avg_mph"/>
+                <field name="heart_rate"/>
+                <field name="meters_per_beat"/>
+                <field name="workout_strain"/>
+                <field name="effort" optional="hide"/>
+                <field name="recovery_score"/>
+                <field name="recovery_zone" widget="badge"
+                       decoration-success="recovery_zone == 'green'"
+                       decoration-warning="recovery_zone == 'yellow'"
+                       decoration-danger="recovery_zone == 'red'"/>
+                <field name="hrv"/>
+                <field name="sleep_hours" widget="float_time" optional="show"/>
+                <field name="next_recovery" optional="show"/>
+                <field name="recovery_change" optional="show"/>
+                <field name="hrv_change" optional="hide"/>
+                <field name="rhr_change" optional="hide"/>
+                <button name="action_open_activity" type="object" icon="open_in_new" title="Open activity"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fitness_activity_insight_view_pivot" model="ir.ui.view">
+        <field name="name">fitness.activity.insight.pivot</field>
+        <field name="model">fitness.activity.insight</field>
+        <field name="arch" type="xml">
+            <pivot string="Recovery vs. Performance">
+                <field name="recovery_zone" type="row"/>
+                <field name="sport_group" type="col"/>
+                <field name="pace_min_mi" type="measure" widget="float_time" options="{'unit': 'minutes', 'show_seconds': True}"/>
+                <field name="avg_mph" type="measure"/>
+                <field name="heart_rate" type="measure"/>
+                <field name="meters_per_beat" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="fitness_activity_insight_view_graph" model="ir.ui.view">
+        <field name="name">fitness.activity.insight.graph</field>
+        <field name="model">fitness.activity.insight</field>
+        <field name="arch" type="xml">
+            <graph string="Efficiency by Recovery" type="bar">
+                <field name="recovery_zone"/>
+                <field name="sport_group"/>
+                <field name="meters_per_beat" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="fitness_activity_insight_view_search" model="ir.ui.view">
+        <field name="name">fitness.activity.insight.search</field>
+        <field name="model">fitness.activity.insight</field>
+        <field name="arch" type="xml">
+            <search string="Activity vs. Recovery">
+                <field name="name"/>
+                <filter name="run" string="Runs" domain="[('sport_group', '=', 'run')]"/>
+                <filter name="ride" string="Rides" domain="[('sport_group', '=', 'ride')]"/>
+                <filter name="walk" string="Walks / Hikes" domain="[('sport_group', '=', 'walk')]"/>
+                <separator/>
+                <filter name="green" string="Green Recovery" domain="[('recovery_zone', '=', 'green')]"/>
+                <filter name="yellow" string="Yellow Recovery" domain="[('recovery_zone', '=', 'yellow')]"/>
+                <filter name="red" string="Red Recovery" domain="[('recovery_zone', '=', 'red')]"/>
+                <separator/>
+                <filter name="easy" string="Easy Efforts" domain="[('effort', '=', 'easy')]"/>
+                <filter name="hard" string="Hard Efforts" domain="[('effort', '=', 'hard')]"/>
+                <separator/>
+                <filter name="with_hr" string="Has Heart Rate" domain="[('heart_rate', '>', 0)]"/>
+                <filter name="activity_date" string="Date" date="activity_date"/>
+                <group>
+                    <filter name="group_zone" string="Recovery Zone" context="{'group_by': 'recovery_zone'}"/>
+                    <filter name="group_sport" string="Sport" context="{'group_by': 'sport_group'}"/>
+                    <filter name="group_effort" string="Effort" context="{'group_by': 'effort'}"/>
+                    <filter name="group_tod" string="Time of Day" context="{'group_by': 'time_of_day'}"/>
+                    <filter name="group_sleep" string="Sleep Before" context="{'group_by': 'sleep_bucket'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'activity_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fitness_activity_insight_action" model="ir.actions.act_window">
+        <field name="name">Recovery vs. Performance</field>
+        <field name="res_model">fitness.activity.insight</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_with_hr': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No overlapping Strava and WHOOP data yet</p>
+            <p>Each Strava activity is paired with that morning's WHOOP recovery and the WHOOP workout recorded at the same time.</p>
+        </field>
+    </record>
+
+    <!-- ========================= Next-Day Cost ========================= -->
+    <record id="fitness_day_view_list" model="ir.ui.view">
+        <field name="name">fitness.day.list</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <list string="Training Days" create="0" edit="0" delete="0"
+                  decoration-muted="day_type == 'rest'" decoration-bf="day_type == 'hard'">
+                <field name="date"/>
+                <field name="day_type" widget="badge"
+                       decoration-info="day_type == 'light'"
+                       decoration-warning="day_type == 'moderate'"
+                       decoration-danger="day_type == 'hard'"/>
+                <field name="activity_count"/>
+                <field name="distance_mi"/>
+                <field name="moving_hours" widget="float_time"/>
+                <field name="day_strain"/>
+                <field name="recovery_score"/>
+                <field name="hrv"/>
+                <field name="rhr" optional="hide"/>
+                <field name="sleep_hours" widget="float_time" optional="show"/>
+                <field name="next_recovery"/>
+                <field name="recovery_change"/>
+                <field name="hrv_change"/>
+                <field name="rhr_change"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="fitness_day_view_pivot" model="ir.ui.view">
+        <field name="name">fitness.day.pivot</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <pivot string="Next-Day Cost">
+                <field name="day_type" type="row"/>
+                <field name="activity_count" type="measure"/>
+                <field name="next_recovery" type="measure"/>
+                <field name="recovery_change" type="measure"/>
+                <field name="hrv_change" type="measure"/>
+                <field name="rhr_change" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="fitness_day_view_graph" model="ir.ui.view">
+        <field name="name">fitness.day.graph</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <graph string="Next-Day Recovery Change" type="bar">
+                <field name="day_type"/>
+                <field name="recovery_change" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="fitness_day_view_graph_trend" model="ir.ui.view">
+        <field name="name">fitness.day.graph.trend</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <graph string="Weekly HRV" type="line">
+                <field name="date" interval="week"/>
+                <field name="hrv" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="fitness_day_view_search" model="ir.ui.view">
+        <field name="name">fitness.day.search</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <search string="Training Days">
+                <filter name="training" string="Training Days" domain="[('day_type', '!=', 'rest')]"/>
+                <filter name="rest" string="Rest Days" domain="[('day_type', '=', 'rest')]"/>
+                <separator/>
+                <filter name="has_next" string="Has Next-Day Recovery" domain="[('next_recovery', '!=', False)]"/>
+                <filter name="has_night" string="Has Sleep That Night" domain="[('night_sleep_hours', '!=', False)]"/>
+                <filter name="date" string="Date" date="date"/>
+                <group>
+                    <filter name="group_type" string="Day Type" context="{'group_by': 'day_type'}"/>
+                    <filter name="group_zone" string="Recovery Zone" context="{'group_by': 'recovery_zone'}"/>
+                    <filter name="group_last" string="Last Session" context="{'group_by': 'last_session'}"/>
+                    <filter name="group_week" string="Week" context="{'group_by': 'date:week'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fitness_day_action" model="ir.actions.act_window">
+        <field name="name">Next-Day Cost</field>
+        <field name="res_model">fitness.day</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_has_next': 1}</field>
+    </record>
+
+    <record id="fitness_day_trend_action" model="ir.actions.act_window">
+        <field name="name">Training Load vs. HRV</field>
+        <field name="res_model">fitness.day</field>
+        <field name="view_mode">graph,list</field>
+        <field name="view_id" ref="fitness_day_view_graph_trend"/>
+        <field name="help" type="html">
+            <p>Switch the measure between HRV, Resting HR, Distance and Day Strain to compare weekly training volume with how your body is trending.</p>
+        </field>
+    </record>
+    <!-- ======================== Training & Sleep ======================== -->
+    <record id="fitness_day_view_pivot_sleep" model="ir.ui.view">
+        <field name="name">fitness.day.pivot.sleep</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <pivot string="Training and That Night's Sleep">
+                <field name="last_session" type="row"/>
+                <field name="day_type" type="col"/>
+                <field name="night_sleep_performance" type="measure"/>
+                <field name="night_sleep_hours" type="measure" widget="float_time"/>
+                <field name="night_deep_hours" type="measure" widget="float_time"/>
+                <field name="night_rem_hours" type="measure" widget="float_time"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="fitness_day_view_graph_sleep" model="ir.ui.view">
+        <field name="name">fitness.day.graph.sleep</field>
+        <field name="model">fitness.day</field>
+        <field name="arch" type="xml">
+            <graph string="Sleep Performance by Last Session" type="bar">
+                <field name="last_session"/>
+                <field name="night_sleep_performance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="fitness_day_sleep_action" model="ir.actions.act_window">
+        <field name="name">Training &amp; Sleep</field>
+        <field name="res_model">fitness.day</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_has_night': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('fitness_day_view_pivot_sleep')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('fitness_day_view_graph_sleep')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('fitness_day_view_list')})]"/>
+    </record>
+
+    <record id="fitness_activity_insight_view_pivot_sleep" model="ir.ui.view">
+        <field name="name">fitness.activity.insight.pivot.sleep</field>
+        <field name="model">fitness.activity.insight</field>
+        <field name="arch" type="xml">
+            <pivot string="Sleep Before vs. Performance">
+                <field name="sleep_bucket" type="row"/>
+                <field name="sport_group" type="col"/>
+                <field name="pace_min_mi" type="measure" widget="float_time" options="{'unit': 'minutes', 'show_seconds': True}"/>
+                <field name="avg_mph" type="measure"/>
+                <field name="heart_rate" type="measure"/>
+                <field name="meters_per_beat" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="fitness_activity_sleep_action" model="ir.actions.act_window">
+        <field name="name">Sleep Before vs. Performance</field>
+        <field name="res_model">fitness.activity.insight</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="context">{'search_default_with_hr': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('fitness_activity_insight_view_pivot_sleep')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('fitness_activity_insight_view_list')})]"/>
+    </record>
+</odoo>

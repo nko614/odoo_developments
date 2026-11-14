@@ -7,6 +7,13 @@
         <menuitem id="menu_nko_strava_stats_analysis" name="Activity Analysis" action="strava_activity_stats_action" sequence="10"/>
         <menuitem id="menu_nko_strava_stats_totals" name="Strava Totals" action="strava_athlete_stat_action" sequence="20"/>
     </menuitem>
+    <menuitem id="menu_nko_strava_insights" name="Insights" parent="menu_nko_strava_root" sequence="35">
+        <menuitem id="menu_nko_strava_insight_performance" name="Recovery vs. Performance" action="fitness_activity_insight_action" sequence="10"/>
+        <menuitem id="menu_nko_strava_insight_cost" name="Next-Day Cost" action="fitness_day_action" sequence="20"/>
+        <menuitem id="menu_nko_strava_insight_trend" name="Training Load vs. HRV" action="fitness_day_trend_action" sequence="30"/>
+        <menuitem id="menu_nko_strava_insight_sleep" name="Training &amp; Sleep" action="fitness_day_sleep_action" sequence="40"/>
+        <menuitem id="menu_nko_strava_insight_sleep_before" name="Sleep Before vs. Performance" action="fitness_activity_sleep_action" sequence="50"/>
+    </menuitem>
     <menuitem id="menu_nko_strava_whoop" name="WHOOP" parent="menu_nko_strava_root" sequence="40">
         <menuitem id="menu_nko_strava_whoop_recovery" name="Recovery" action="whoop_recovery_action" sequence="10"/>
         <menuitem id="menu_nko_strava_whoop_sleep" name="Sleep" action="whoop_sleep_action" sequence="20"/>

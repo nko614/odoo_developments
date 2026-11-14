@@ -6,3 +6,5 @@ access_whoop_recovery_user,whoop.recovery user,whoop.recovery,base.group_user,cr
 access_whoop_sleep_user,whoop.sleep user,whoop.sleep,base.group_user,crud,
 access_whoop_cycle_user,whoop.cycle user,whoop.cycle,base.group_user,crud,
 access_whoop_workout_user,whoop.workout user,whoop.workout,base.group_user,crud,
+access_fitness_activity_insight_user,fitness.activity.insight user,fitness.activity.insight,base.group_user,r,
+access_fitness_day_user,fitness.day user,fitness.day,base.group_user,r,
