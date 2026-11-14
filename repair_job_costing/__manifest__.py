@@ -1,20 +1,25 @@
 {
     'name': 'Repair Job Costing',
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.1.1',
     'category': 'Supply Chain/Inventory',
-    'summary': 'Repair stages, photos, timesheets, gross margin per sale order and a customer portal page',
+    'summary': 'Job costing, stages, photos and a customer portal page for repairs sold on sale orders',
     'description': """
-Adds job costing and customer follow-up to the Repairs app:
+Extends the Repairs app for repairs that are sold on a sale order. Confirming the
+order creates the repair, as in standard Odoo. This module adds:
 
-* A sale order that creates a repair gets its own analytic account. Order revenue,
-  labor from timesheets logged on the repair and the cost of parts used on the
-  repair are posted to it. A Gross Margin button on the sale order shows the result.
-* Configurable repair stages with a kanban view. Ending a repair moves it to
-  Ready for Pickup, and moving it to Ready for Pickup ends it.
-* A Timesheets tab and a Photos tab on the repair form. Photos can be taken with
-  a phone or tablet camera.
+* One analytic account per sale order. Invoiced revenue, labor from timesheets
+  logged on the repair and the cost of the parts used on the repair are posted to it.
+* A Gross Margin button on the sale order that shows the balance of that account
+  and opens its lines.
+* A Timesheets tab on the repair with the hours spent and the labor cost, based on
+  each employee's hourly cost.
+* Configurable repair stages with a kanban view. Ending a repair moves it to Ready
+  for Pickup, and moving it to Ready for Pickup ends it.
+* A Photos tab on the repair. On a phone or tablet the camera can be used.
 * A portal page where customers follow their repairs and send messages. Costs,
   timesheets, internal notes and photos are not shown.
+* A Repair Margin report with revenue, labor and parts per customer and per
+  repaired product.
 """,
     'depends': ['repair', 'hr_timesheet', 'project_stock_account'],
     'data': [
@@ -31,7 +36,7 @@ Adds job costing and customer follow-up to the Repairs app:
     },
     'demo': ['demo/repair_job_costing_demo.xml'],
     'post_init_hook': '_post_init_hook',
-    'images': ['static/description/banner.png'],
+    'images': ['static/description/banner.png', 'static/description/screenshot_repair_margin.png'],
     'author': 'Nicholas Kosinski',
     'maintainer': 'Nicholas Kosinski',
     'website': 'https://github.com/nko614/odoo_developments',

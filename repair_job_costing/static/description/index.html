@@ -2,22 +2,23 @@
   <div class="row">
     <div class="col-12 text-center">
       <h2>Repair Job Costing</h2>
-      <p class="lead">Adds stages, photos, timesheets and job costing to the Repairs app, with one analytic account per sale order and a portal page where customers follow their repairs.</p>
+      <p class="lead">Job costing, stages, photos and a customer portal page for repairs sold on sale orders.</p>
       <img src="banner.png" alt="Repair Job Costing" class="img-fluid" style="max-width:720px"/>
     </div>
   </div>
 </section>
 
 <section class="container mt-5">
-  <h3>What it does</h3>
+  <h3>What you get</h3>
   <ul>
-    <li><b>One analytic account per sale order.</b> When a sale order with a repair product is confirmed, Odoo creates the repair (standard) and this module gives the order its own analytic account. The order lines, the timesheets logged on the repair and the cost of the parts used on the repair are all posted to it.</li>
+    <li><b>Repairs from sale orders.</b> Confirming a sale order with a repair product creates the repair. This is standard Odoo; the module builds on it.</li>
+    <li><b>One analytic account per sale order.</b> Invoiced revenue, labor from timesheets logged on the repair and the cost of the parts used on the repair are posted to it. The account is shown on the sale order and on the repair.</li>
     <li><b>Gross Margin button on the sale order.</b> Shows the balance of the order's analytic account. Clicking it lists the revenue and cost lines, grouped by category.</li>
-    <li><b>Repair Margin report</b> under Repairs &gt; Reporting: revenue, labor and parts of repairs per customer and per repaired product.</li>
-    <li><b>Timesheets tab on the repair.</b> Technicians log their time on the repair. The tab shows the hours and the labor cost, based on each employee's hourly cost.</li>
-    <li><b>Photos tab on the repair.</b> Several photos per repair, for example at intake and when finished. On a phone or tablet the Add Photos button opens the camera. Click a photo to see it full size.</li>
+    <li><b>Timesheets tab on the repair.</b> Technicians log their time on the repair. The tab shows the hours spent and the labor cost, based on each employee's hourly cost.</li>
     <li><b>Repair stages.</b> Received, In Repair and Ready for Pickup by default, editable under Repairs &gt; Configuration &gt; Stages. Stage changes are logged in the chatter and the kanban view is grouped by stage. Ending a repair moves it to Ready for Pickup, and moving a repair to Ready for Pickup ends it.</li>
-    <li><b>Customer portal.</b> Customers see their own repairs under My Account, with the stage, the sale order, the scheduled date, and a message thread with your team. Costs, timesheets, internal notes and photos are not shown.</li>
+    <li><b>Photos tab on the repair.</b> Several photos per repair, for example at intake and when finished. On a phone or tablet the Add Photos button opens the camera. Click a photo to see it full size.</li>
+    <li><b>Customer portal.</b> Customers see their own repairs under My Account, with the stage, the sale order, the scheduled date and a message thread with your team. Costs, timesheets, internal notes and photos are not shown.</li>
+    <li><b>Repair Margin report</b> under Repairs &gt; Reporting: revenue, labor and parts per customer and per repaired product.</li>
   </ul>
 
   <h3>Screenshots</h3>
@@ -27,6 +28,8 @@
   <img src="screenshot_repair_photos.png" alt="Repair photos tab" class="img-fluid border mb-4"/>
   <p><b>Gross margin of a sale order</b>: invoiced revenue, parts and labor on one account.</p>
   <img src="screenshot_gross_margin.png" alt="Gross Margin button and analytic lines" class="img-fluid border mb-4"/>
+  <p><b>Repair Margin report</b>: revenue and costs per customer and repaired product.</p>
+  <img src="screenshot_repair_margin.png" alt="Repair Margin pivot" class="img-fluid border mb-4"/>
   <p><b>Repairs by stage.</b></p>
   <img src="screenshot_kanban.png" alt="Repair kanban by stage" class="img-fluid border mb-4"/>
   <p><b>The customer's repair page</b> in the portal.</p>
@@ -34,10 +37,17 @@
 
   <h3>Setup</h3>
   <ul>
-    <li>Turn on <i>Analytic Accounting</i> in the Accounting settings to see the analytic account and the Gross Margin button.</li>
+    <li>Turn on <i>Analytic Accounting</i> in the Accounting settings to see the analytic account, the Gross Margin button and the Repair Margin report.</li>
     <li>Set an <i>Hourly Cost</i> on the employees who log time on repairs. Without it, labor is posted at zero.</li>
     <li>On the product you sell for repairs: product type Service, <i>Create on Order</i> set to Repair Order.</li>
-    <li>Parts cost is taken from the stock move value. Periodic valuation is enough; real-time valuation is not needed.</li>
+    <li>Give the people who log time on repairs a <i>Timesheets</i> access right. The Timesheets tab is hidden from other users.</li>
+  </ul>
+
+  <h3>Limits</h3>
+  <ul>
+    <li>A repair created from a sale order has no repaired product until someone sets it on the repair. Until then its lines show no repaired product in the Repair Margin report.</li>
+    <li>The Repair Margin report contains the invoice lines of sale orders with repairs and the timesheet and part lines of repairs. Costs posted by hand to an order's analytic account appear in its Gross Margin but not in the report.</li>
+    <li>With perpetual valuation, the invoice also posts its cost of goods sold lines to the order's analytic account: one on the expense account and one on the stock account, which cancel out. The margin totals stay correct, but the report shows these two extra lines.</li>
   </ul>
 
   <h3>Requirements</h3>

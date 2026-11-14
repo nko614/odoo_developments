@@ -4,7 +4,7 @@ from odoo import fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    analytic_currency_id = fields.Many2one(related='analytic_account_id.currency_id')
+    analytic_currency_id = fields.Many2one(related='analytic_account_id.currency_id', string="Analytic Account Currency")
     analytic_balance = fields.Monetary(
         "Gross Margin", related='analytic_account_id.balance', currency_field='analytic_currency_id',
         groups='analytic.group_analytic_accounting')
