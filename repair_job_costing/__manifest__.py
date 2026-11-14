@@ -1,6 +1,6 @@
 {
     'name': 'Repair Job Costing',
-    'version': '20.0.1.1.1',
+    'version': '20.0.1.1.2',
     'category': 'Supply Chain/Inventory',
     'summary': 'Job costing, stages, photos and a customer portal page for repairs sold on sale orders',
     'description': """

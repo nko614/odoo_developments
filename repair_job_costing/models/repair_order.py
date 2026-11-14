@@ -49,11 +49,9 @@ class RepairOrder(models.Model):
         ready = self.env.ref('repair_job_costing.repair_stage_ready_for_pickup', raise_if_not_found=False)
         if ready and vals.get('stage_id') == ready.id:
             # Moving a repair to Ready for Pickup ends it, as End Repair does.
-            repairs = self.filtered(lambda r: r.state in ('draft', 'confirmed'))
             if self.filtered(lambda r: r.state == 'cancel'):
                 raise UserError(self.env._("A cancelled repair can't be ready for pickup."))
-            if not repairs:
-                return res
+            repairs = self.filtered(lambda r: r.state in ('draft', 'confirmed'))
             repairs._action_repair_confirm()
             repairs.action_assign()
             if repairs.move_ids.filtered(lambda m: m.state != 'cancel' and m.quantity != m.product_uom_qty):

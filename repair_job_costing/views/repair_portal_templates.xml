@@ -2,10 +2,8 @@
 <odoo>
     <template id="portal_my_home_menu_repair" name="Portal layout: repair menu entries" inherit_id="portal.portal_breadcrumbs" priority="40">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-            <li t-if="page_name == 'repair'" t-attf-class="breadcrumb-item #{'active' if not repair else ''}">
-                <a t-if="repair" href="/my/repairs">Repairs</a>
-                <t t-else="">Repairs</t>
-            </li>
+            <li t-if="page_name == 'repair' and not repair" class="breadcrumb-item active">Repairs</li>
+            <li t-if="page_name == 'repair' and repair" class="breadcrumb-item"><a href="/my/repairs">Repairs</a></li>
             <li t-if="page_name == 'repair' and repair" class="breadcrumb-item active" t-out="repair.name"/>
         </xpath>
     </template>
@@ -88,12 +86,6 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-transparent fw-bold">Details</div>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between gap-3">
-                                <span class="text-muted">Customer</span><span class="text-end" t-out="repair.partner_id.display_name"/>
-                            </li>
-                            <li t-if="repair.product_id" class="list-group-item d-flex justify-content-between gap-3">
-                                <span class="text-muted">Product</span><span class="text-end" t-out="repair.product_id.display_name"/>
-                            </li>
                             <li t-if="repair.lot_id" class="list-group-item d-flex justify-content-between gap-3">
                                 <span class="text-muted">Serial number</span><span class="text-end" t-out="repair.lot_id.name"/>
                             </li>
