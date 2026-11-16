@@ -60,4 +60,20 @@ class RepairOrder(models.Model):
         ready = self.env.ref('repair_job_costing.repair_stage_ready_for_pickup', raise_if_not_found=False)
         if ready:
             self.filtered(lambda r: r.stage_id != ready).stage_id = ready
+        self._prepare_return_delivery()
         return res
+
+    def _prepare_return_delivery(self):
+        """Add each finished item received on a receipt to the open return of that receipt
+        (created on the first finished item), with its serial number. Not validated."""
+        for repair in self.filtered(lambda r: r.picking_id.picking_type_code == 'incoming' and r.picking_id.state == 'done'):
+            receipt = repair.picking_id
+            delivery = receipt.return_ids.filtered(lambda p: p.state not in ('done', 'cancel'))[:1] or receipt._create_return()
+            move = delivery.move_ids.filtered(lambda m: m.product_id == repair.product_id and m.state != 'cancel')[:1]
+            move.product_uom_qty += repair.product_qty
+            move._action_confirm()
+            self.env['stock.move.line'].create({
+                'move_id': move.id, 'picking_id': delivery.id, 'product_id': move.product_id.id,
+                'lot_id': repair.lot_id.id, 'quantity': repair.product_qty, 'owner_id': receipt.owner_id.id,
+                'location_id': move.location_id.id, 'location_dest_id': move.location_dest_id.id,
+            })

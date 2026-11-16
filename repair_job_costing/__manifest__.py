@@ -1,6 +1,6 @@
 {
     'name': 'Repair Job Costing',
-    'version': '20.0.1.1.3',
+    'version': '20.0.1.2.0',
     'category': 'Supply Chain/Inventory',
     'summary': 'Job costing, stages, photos and a customer portal page for repairs sold on sale orders',
     'description': """
@@ -20,6 +20,9 @@ order creates the repair, as in standard Odoo. This module adds:
   timesheets, internal notes and photos are not shown.
 * A Repair Margin report with revenue, labor and parts per customer and per
   repaired product.
+* Customer items received on a receipt with the customer as owner are assigned to
+  that customer's open repairs from sale orders. When a repair is ended, the item
+  is added to a return delivery of that receipt, ready to ship back.
 """,
     'depends': ['repair', 'hr_timesheet', 'project_stock_account'],
     'data': [

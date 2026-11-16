@@ -18,6 +18,7 @@
     <li><b>Repair stages.</b> Received, In Repair and Ready for Pickup by default, editable under Repairs &gt; Configuration &gt; Stages. Stage changes are logged in the chatter and the kanban view is grouped by stage. Ending a repair moves it to Ready for Pickup, and moving a repair to Ready for Pickup ends it.</li>
     <li><b>Photos tab on the repair.</b> Several photos per repair, for example at intake and when finished. On a phone or tablet the Add Photos button opens the camera. Click a photo to see it full size.</li>
     <li><b>Customer portal.</b> Customers see their own repairs under My Account, with the stage, the sale order, the scheduled date and a message thread with your team. Costs, timesheets, internal notes and photos are not shown.</li>
+    <li><b>Receiving and returning customer items.</b> Validating a receipt that has the customer as owner assigns the received items, with their serial numbers, to that customer's open repairs from sale orders that have no product yet, oldest repair first and in the order of the receipt lines. When a repair is ended, its item is added to a return delivery of that receipt, so finished items of one drop-off ship together. The delivery is not validated automatically.</li>
     <li><b>Repair Margin report</b> under Repairs &gt; Reporting: revenue, labor and parts per customer and per repaired product.</li>
   </ul>
 
@@ -40,12 +41,16 @@
     <li>Turn on <i>Analytic Accounting</i> in the Accounting settings to see the analytic account, the Gross Margin button and the Repair Margin report.</li>
     <li>Set an <i>Hourly Cost</i> on the employees who log time on repairs. Without it, labor is posted at zero.</li>
     <li>On the product you sell for repairs: product type Service, <i>Create on Order</i> set to Repair Order.</li>
+    <li>To receive customer items: turn on <i>Storage Locations</i>, <i>Lots &amp; Serial Numbers</i> and <i>Consignment</i> in the Inventory settings. Create a location for items in repair and an incoming operation type with the Customers location as source, that location as destination, and Delivery Orders as the operation type for returns. On the Repairs operation type, set the product source and destination location to the same location. On each receipt, set <i>Assign Owner</i> to the customer, so the items stay the customer's stock and are not valued.</li>
+    <li>Sell one repair line per item. Each line creates one repair.</li>
     <li>Give the people who log time on repairs a <i>Timesheets</i> access right. The Timesheets tab is hidden from other users.</li>
   </ul>
 
   <h3>Limits</h3>
   <ul>
-    <li>A repair created from a sale order has no repaired product until someone sets it on the repair. Until then its lines show no repaired product in the Repair Margin report.</li>
+    <li>Items are matched to repairs by order only (oldest repair, first receipt line). Check the repairs after the receipt if the items of one customer need different work. Items received before the sale order is confirmed are not assigned; set them on the repair by hand.</li>
+    <li>The standard repair move of the item itself is recorded without an owner. Ownership stays correct as long as the product source and destination location of the Repairs operation type are the same location, as in the setup above.</li>
+    <li>A repair created from a sale order has no repaired product until someone sets it on the repair or a receipt assigns one. Until then its lines show no repaired product in the Repair Margin report.</li>
     <li>The Repair Margin report contains the invoice lines of sale orders with repairs and the timesheet and part lines of repairs. Costs posted by hand to an order's analytic account appear in its Gross Margin but not in the report.</li>
     <li>With perpetual valuation, the invoice also posts its cost of goods sold lines to the order's analytic account: one on the expense account and one on the stock account, which cancel out. The margin totals stay correct, but the report shows these two extra lines.</li>
   </ul>

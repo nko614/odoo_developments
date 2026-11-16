@@ -189,6 +189,60 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
         self.assertEqual(totals[self.customer], 300.0)
         self.assertEqual(totals[other_customer], 150.0)
 
+    def _receive_items(self, partner, products):
+        warehouse = self.order.warehouse_id
+        customers = self.env.ref('stock.stock_location_customers')
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': warehouse.in_type_id.id, 'partner_id': partner.id, 'owner_id': partner.id,
+            'location_id': customers.id, 'location_dest_id': warehouse.lot_stock_id.id,
+            'move_ids': [Command.create({'product_id': product.id, 'product_uom_qty': 1,
+                'location_id': customers.id, 'location_dest_id': warehouse.lot_stock_id.id}) for product in products],
+        })
+        receipt.action_confirm()
+        receipt.action_assign()
+        for move in receipt.move_ids:
+            move.move_line_ids.write({'lot_name': f"SN-{move.product_id.name}", 'quantity': 1})
+        receipt.button_validate()
+        return receipt
+
+    def test_receipt_assigns_items_and_finished_items_are_prepared_for_return(self):
+        city, cargo = self.env['product.product'].create([
+            {'name': name, 'is_storable': True, 'tracking': 'serial'} for name in ("City Bike", "Cargo Bike")])
+        order = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({'product_id': self.repair_product.id}) for _ in range(2)],
+        })
+        order.action_confirm()
+        repairs = order.repair_order_ids.sorted('id')
+        receipt = self._receive_items(self.customer, city | cargo)
+
+        # Items go to the customer's open repairs without a product, oldest first (self.repair
+        # from setUpClass is the oldest one).
+        self.assertEqual((self.repair | repairs).mapped('product_id'), city | cargo)
+        self.assertEqual(self.repair.lot_id.name, "SN-City Bike")
+        self.assertEqual(repairs[0].product_id, cargo)
+        self.assertEqual(repairs[0].picking_id, receipt)
+        self.assertFalse(repairs[1].product_id)
+        # Create Repair on the receipt opens the existing repairs instead of making a new one.
+        self.assertEqual(receipt.action_repair_return()['res_model'], 'repair.order')
+        self.assertEqual(receipt.nbr_repairs, 2)
+
+        (self.repair | repairs[0]).action_repair_end()
+        delivery = receipt.return_ids
+        self.assertEqual(len(delivery), 1)
+        self.assertEqual(delivery.state, 'assigned')
+        self.assertEqual(delivery.location_dest_id, receipt.location_id)
+        self.assertEqual(sorted(delivery.move_line_ids.lot_id.mapped("name")), ["SN-Cargo Bike", "SN-City Bike"])
+        self.assertEqual(delivery.move_line_ids.owner_id, self.customer)
+        # The items are still the customer's after the repair: owned stock, no value.
+        quants = self.env['stock.quant'].search([('product_id', 'in', (city | cargo).ids), ('quantity', '>', 0),
+                                                 ('location_id.usage', '=', 'internal')])
+        self.assertEqual(quants.owner_id, self.customer)
+        self.assertEqual(sum(quants.mapped('value')), 0.0)
+        delivery.button_validate()
+        self.assertFalse(self.env['stock.quant'].search([('lot_id', 'in', delivery.move_line_ids.lot_id.ids),
+                                                         ('quantity', '>', 0), ('location_id.usage', '=', 'internal')]))
+
 
 @tagged('post_install', '-at_install')
 class TestRepairPortal(HttpCase):
