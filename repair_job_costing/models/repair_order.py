@@ -64,16 +64,14 @@ class RepairOrder(models.Model):
         return res
 
     def _prepare_return_delivery(self):
-        """Add each finished item received on a receipt to the open return of that receipt
-        (created on the first finished item), with its serial number. Not validated."""
-        for repair in self.filtered(lambda r: r.picking_id.picking_type_code == 'incoming' and r.picking_id.state == 'done'):
-            receipt = repair.picking_id
-            delivery = receipt.return_ids.filtered(lambda p: p.state not in ('done', 'cancel'))[:1] or receipt._create_return()
-            move = delivery.move_ids.filtered(lambda m: m.product_id == repair.product_id and m.state != 'cancel')[:1]
-            move.product_uom_qty += repair.product_qty
-            move._action_confirm()
-            self.env['stock.move.line'].create({
-                'move_id': move.id, 'picking_id': delivery.id, 'product_id': move.product_id.id,
-                'lot_id': repair.lot_id.id, 'quantity': repair.product_qty, 'owner_id': receipt.owner_id.id,
-                'location_id': move.location_id.id, 'location_dest_id': move.location_dest_id.id,
-            })
+        """Make each finished item's line on the return delivery of its sale order ready to ship:
+        reserved with the item's serial number and owner. Not validated."""
+        move_line_vals = []
+        for repair in self:
+            move = repair.sale_order_line_id.move_ids.filtered(
+                lambda m: m.state == 'waiting' and m.picking_code == 'outgoing')[:1]
+            if move:
+                move.procure_method = 'make_to_stock'  # created make to order so it waits for the repair
+                move_line_vals.append({**move._prepare_move_line_vals(repair.product_qty),
+                                       'lot_id': repair.lot_id.id, 'owner_id': repair.picking_id.owner_id.id})
+        self.env['stock.move.line'].create(move_line_vals)

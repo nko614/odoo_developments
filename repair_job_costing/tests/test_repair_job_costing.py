@@ -2,7 +2,7 @@ import ast
 
 from odoo.exceptions import AccessError, UserError
 from odoo.fields import Command
-from odoo.tests import HttpCase, new_test_user, tagged
+from odoo.tests import Form, HttpCase, new_test_user, tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -161,7 +161,8 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
         self.assertFalse(self._account_lines(product_id=self.part.id).filtered('repair_id').project_id)
 
     def test_part_lines_are_not_timesheets(self):
-        self.env.user.group_ids |= self.env.ref('hr_timesheet.group_hr_timesheet_user')
+        self.env.user.group_ids |= (self.env.ref('hr_timesheet.group_hr_timesheet_user')
+                                    | self.env.ref('sales_team.group_sale_salesman_all_leads'))
         self.env['stock.quant']._update_available_quantity(self.part, self.order.warehouse_id.lot_stock_id, 5)
         technician = self.env['hr.employee'].sudo().create({
             'name': "Technician", 'hourly_cost': 40.0, 'user_id': self.env.user.id})
@@ -189,59 +190,98 @@ class TestRepairJobCosting(AccountTestInvoicingCommon):
         self.assertEqual(totals[self.customer], 300.0)
         self.assertEqual(totals[other_customer], 150.0)
 
-    def _receive_items(self, partner, products):
-        warehouse = self.order.warehouse_id
-        customers = self.env.ref('stock.stock_location_customers')
-        receipt = self.env['stock.picking'].create({
-            'picking_type_id': warehouse.in_type_id.id, 'partner_id': partner.id, 'owner_id': partner.id,
-            'location_id': customers.id, 'location_dest_id': warehouse.lot_stock_id.id,
-            'move_ids': [Command.create({'product_id': product.id, 'product_uom_qty': 1,
-                'location_id': customers.id, 'location_dest_id': warehouse.lot_stock_id.id}) for product in products],
+    def test_items_received_repaired_and_returned(self):
+        # Repair Receipts and WH/Repair belong to the main warehouse.
+        main_company = self.env.ref('base.main_company')
+        self.env.user.company_ids |= main_company
+        self.env.user.group_ids |= (self.env.ref('hr_timesheet.group_hr_timesheet_user')
+                                    | self.env.ref('sales_team.group_sale_salesman_all_leads'))
+        self.env = self.env(context=dict(self.env.context, allowed_company_ids=main_company.ids))
+        self.part.with_company(main_company).standard_price = 20.0
+        salesman = new_test_user(self.env, login='salesman', groups='sales_team.group_sale_salesman')
+        warehouse_user = new_test_user(
+            self.env, login='warehouse_user', groups='stock.group_stock_user,stock.group_production_lot')
+        city, cargo = self.env['product.product'].create([
+            {'name': name, 'is_storable': True, 'tracking': 'serial'} for name in ("City Bike", "Cargo Bike")])
+        order = self.env['sale.order'].with_user(salesman).create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({'product_id': self.repair_product.id, 'repair_product_id': item.id})
+                           for item in (city, cargo)],
         })
-        receipt.action_confirm()
-        receipt.action_assign()
+        order.action_confirm()
+        order = order.with_user(self.env.user)
+
+        # Confirmation creates the receipt and the return delivery, not the repairs.
+        self.assertFalse(order.repair_order_ids)
+        receipt = order.picking_ids.filtered(lambda p: p.picking_type_code == 'incoming')
+        delivery = order.picking_ids - receipt
+        repair_location = self.env.ref('repair_job_costing.stock_location_repair')
+        self.assertEqual(receipt.picking_type_id, self.env.ref('repair_job_costing.picking_type_repair_receipt'))
+        self.assertEqual(receipt.state, 'assigned')
+        self.assertEqual(receipt.location_dest_id, repair_location)
+        self.assertEqual(delivery.picking_type_id, order.warehouse_id.out_type_id)
+        self.assertEqual(delivery.location_id, repair_location)
+        self.assertEqual(delivery.state, 'waiting')
+        for picking in receipt | delivery:
+            self.assertEqual((picking.owner_id, picking.partner_id, picking.origin), (self.customer, self.customer, order.name))
+            self.assertEqual(picking.move_ids.product_id, city | cargo)
+
+        # Receiving the items creates their repairs; the delivery still can't be reserved.
+        receipt = receipt.with_user(warehouse_user)
         for move in receipt.move_ids:
             move.move_line_ids.write({'lot_name': f"SN-{move.product_id.name}", 'quantity': 1})
         receipt.button_validate()
-        return receipt
+        delivery.action_assign()
+        self.assertEqual(delivery.state, 'waiting')
+        self.assertFalse(delivery.move_line_ids)
+        city_repair, cargo_repair = repairs = order.repair_order_ids.sorted('id')
+        self.assertEqual(repairs.sale_order_line_id, order.order_line)
+        self.assertEqual(repairs.mapped('product_id'), city | cargo)
+        self.assertEqual(city_repair.lot_id.name, "SN-City Bike")
+        self.assertEqual(repairs.picking_id, receipt)
+        self.assertEqual(repairs.mapped('state'), ['confirmed', 'confirmed'])
+        self.assertEqual(repairs.analytic_account_id, order.analytic_account_id)
+        # Create Repair on the receipt opens these repairs instead of making a new one.
+        self.assertEqual(receipt.action_repair_return()['domain'], [('id', 'in', repairs.ids)])
 
-    def test_receipt_assigns_items_and_finished_items_are_prepared_for_return(self):
-        city, cargo = self.env['product.product'].create([
-            {'name': name, 'is_storable': True, 'tracking': 'serial'} for name in ("City Bike", "Cargo Bike")])
-        order = self.env['sale.order'].create({
-            'partner_id': self.customer.id,
-            'order_line': [Command.create({'product_id': self.repair_product.id}) for _ in range(2)],
+        # Labor and parts of the repair go to the order's analytic account.
+        self.env['stock.quant']._update_available_quantity(self.part, order.warehouse_id.lot_stock_id, 5)
+        technician = self.env['hr.employee'].sudo().create({
+            'name': "Technician", 'hourly_cost': 40.0, 'user_id': self.env.user.id})
+        city_repair.write({
+            'move_ids': [Command.create({'product_id': self.part.id, 'product_uom_qty': 1.0, 'repair_line_type': 'add'})],
+            'timesheet_ids': [Command.create({'name': "Work", 'unit_amount': 2.0, 'employee_id': technician.id})],
         })
-        order.action_confirm()
-        repairs = order.repair_order_ids.sorted('id')
-        receipt = self._receive_items(self.customer, city | cargo)
+        city_repair.with_user(warehouse_user).action_repair_end()
+        lines = self.env['account.analytic.line'].sudo().search([('account_id', '=', order.analytic_account_id.id)])
+        self.assertEqual(sorted(lines.mapped('amount')), [-80.0, -20.0])
 
-        # Items go to the customer's open repairs without a product, oldest first (self.repair
-        # from setUpClass is the oldest one).
-        self.assertEqual((self.repair | repairs).mapped('product_id'), city | cargo)
-        self.assertEqual(self.repair.lot_id.name, "SN-City Bike")
-        self.assertEqual(repairs[0].product_id, cargo)
-        self.assertEqual(repairs[0].picking_id, receipt)
-        self.assertFalse(repairs[1].product_id)
-        # Create Repair on the receipt opens the existing repairs instead of making a new one.
-        self.assertEqual(receipt.action_repair_return()['res_model'], 'repair.order')
-        self.assertEqual(receipt.nbr_repairs, 2)
-
-        (self.repair | repairs[0]).action_repair_end()
-        delivery = receipt.return_ids
-        self.assertEqual(len(delivery), 1)
+        # Ending the repair makes its item ready to ship, with its serial number and owner.
         self.assertEqual(delivery.state, 'assigned')
-        self.assertEqual(delivery.location_dest_id, receipt.location_id)
-        self.assertEqual(sorted(delivery.move_line_ids.lot_id.mapped("name")), ["SN-Cargo Bike", "SN-City Bike"])
+        self.assertEqual(delivery.move_line_ids.lot_id, city_repair.lot_id)
         self.assertEqual(delivery.move_line_ids.owner_id, self.customer)
-        # The items are still the customer's after the repair: owned stock, no value.
+        # The items are still the customer's: owned stock, no value.
         quants = self.env['stock.quant'].search([('product_id', 'in', (city | cargo).ids), ('quantity', '>', 0),
                                                  ('location_id.usage', '=', 'internal')])
+        self.assertEqual(quants.location_id, repair_location)
         self.assertEqual(quants.owner_id, self.customer)
         self.assertEqual(sum(quants.mapped('value')), 0.0)
-        delivery.button_validate()
-        self.assertFalse(self.env['stock.quant'].search([('lot_id', 'in', delivery.move_line_ids.lot_id.ids),
-                                                         ('quantity', '>', 0), ('location_id.usage', '=', 'internal')]))
+
+        # Ship the finished item now; the other one waits on the backorder until its repair is done.
+        delivery = delivery.with_user(warehouse_user)
+        Form.from_action(self.env, delivery.button_validate()).save().process()
+        self.assertEqual(delivery.state, 'done')
+        backorder = delivery.backorder_ids
+        self.assertEqual((backorder.state, backorder.move_ids.product_id), ('waiting', cargo))
+        cargo_repair.action_repair_end()
+        self.assertEqual(backorder.state, 'assigned')
+        backorder.button_validate()
+        self.assertFalse(self.env['stock.quant'].search([('product_id', 'in', (city | cargo).ids), ('quantity', '>', 0),
+                                                         ('location_id.usage', '=', 'internal')]))
+
+    def test_line_without_item_keeps_standard_repair(self):
+        self.assertEqual(self.repair.sale_order_line_id, self.order.order_line)
+        self.assertFalse(self.order.picking_ids)
 
 
 @tagged('post_install', '-at_install')

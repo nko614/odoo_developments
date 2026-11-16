@@ -10,6 +10,21 @@
         <field name="name">Ready for Pickup</field>
     </record>
 
+    <!-- Customer items in repair. They stay the customer's stock (owner) and are not valued. -->
+    <record id="stock_location_repair" model="stock.location">
+        <field name="name">Repair</field>
+        <field name="location_id" model="stock.warehouse" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+    </record>
+    <record id="picking_type_repair_receipt" model="stock.picking.type">
+        <field name="name">Repair Receipts</field>
+        <field name="code">incoming</field>
+        <field name="sequence_code">RCV-R</field>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="default_location_src_id" ref="stock.stock_location_customers"/>
+        <field name="default_location_dest_id" ref="stock_location_repair"/>
+        <field name="return_picking_type_id" ref="stock.picking_type_out"/>
+    </record>
+
     <!-- Timesheets logged on repairs belong to this project. Internal users only, so they
          never show in the customer portal. -->
     <record id="project_repairs" model="project.project">
